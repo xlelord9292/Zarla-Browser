@@ -37,6 +37,7 @@ If your planning on reuploading your own browser under Zarla Code you must state
 You cannot use our Name or Assets such as Logo, Slogan, Description, etc
 
 Anyone Violating our License will be executed in Court for a copyright session.
+The license is also under the rule of MIT.
 
 
 ### Best Regards,
