@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35"/>
+      <stop offset="50%" style="stop-color:#FF8B4C"/>
+      <stop offset="100%" style="stop-color:#FF4D2D"/>
+    </linearGradient>
+    <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3"/>
+      <stop offset="50%" style="stop-color:#FFFFFF;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect x="32" y="32" width="448" height="448" rx="100" ry="100" fill="url(#bgGradient)"/>
+  
+  <!-- Subtle shine effect -->
+  <rect x="32" y="32" width="448" height="224" rx="100" ry="100" fill="url(#shineGradient)"/>
+  
+  <!-- Z letter - bold, modern style -->
+  <path d="M 150 140 
+           L 362 140 
+           L 362 175 
+           L 205 340 
+           L 362 340 
+           L 362 375 
+           L 150 375 
+           L 150 340 
+           L 307 175 
+           L 150 175 
+           Z" 
+        fill="white"/>
+</svg>

@@ -1,0 +1,152 @@
+<UserControl x:Class="Zarla.Browser.Views.AboutPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BackgroundBrush}">
+    <Grid>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    MaxWidth="500">
+            <!-- Logo -->
+            <Border Width="120" Height="120"
+                    CornerRadius="24"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,24">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#FF6B35" Offset="0"/>
+                        <GradientStop Color="#FF8B4C" Offset="0.5"/>
+                        <GradientStop Color="#FF4D2D" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <!-- Z Logo with shield-like shape inspired by Brave -->
+                    <TextBlock Text="Z"
+                               FontSize="72"
+                               FontWeight="ExtraBold"
+                               FontFamily="Segoe UI"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,-4,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- Name -->
+            <TextBlock Text="Zarla Browser"
+                       FontSize="32"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextBrush}"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Version -->
+            <TextBlock Text="Version 1.0.0"
+                       FontSize="16"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center"
+                       Margin="0,8,0,0"/>
+
+            <!-- Description -->
+            <TextBlock Text="A fast, lightweight, privacy-focused web browser"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center"
+                       Margin="0,24,0,0"/>
+
+            <!-- Features -->
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    CornerRadius="12"
+                    Padding="24"
+                    Margin="0,32,0,0">
+                <StackPanel>
+                    <TextBlock Text="Features"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Margin="0,0,0,16"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="🛡️" FontSize="16" Margin="0,0,12,0"/>
+                        <TextBlock Text="Built-in ad and tracker blocking"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="🔒" FontSize="16" Margin="0,0,12,0"/>
+                        <TextBlock Text="Fingerprint protection"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="⚡" FontSize="16" Margin="0,0,12,0"/>
+                        <TextBlock Text="Tab suspension for memory savings"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="🎨" FontSize="16" Margin="0,0,12,0"/>
+                        <TextBlock Text="Modern dark and light themes"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🔧" FontSize="16" Margin="0,0,12,0"/>
+                        <TextBlock Text="Developer tools included"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Tech Stack -->
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    CornerRadius="12"
+                    Padding="24"
+                    Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Text="Built With"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Margin="0,0,0,16"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Text=".NET 8"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="WPF"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,4"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="WebView2"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Inspired by Chromium"
+                                       Foreground="{DynamicResource TextBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Open Source Notice -->
+            <TextBlock Text="Open Source • MIT License"
+                       FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center"
+                       Margin="0,24,0,0"/>
+
+            <TextBlock Text="github.com/xlelord9292/Zarla-Browser"
+                       FontSize="12"
+                       Foreground="{DynamicResource AccentBrush}"
+                       HorizontalAlignment="Center"
+                       Margin="0,4,0,0"
+                       Cursor="Hand"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

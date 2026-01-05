@@ -1,0 +1,123 @@
+<UserControl x:Class="Zarla.Browser.Views.NewTabPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BackgroundBrush}">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="600">
+            <!-- Logo -->
+            <TextBlock Text="Zarla"
+                       FontSize="72"
+                       FontWeight="Light"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource AccentBrush}"
+                       Margin="0,0,0,40"/>
+
+            <!-- Search Box -->
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="24"
+                    Padding="16,12"
+                    Margin="0,0,0,40">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="🔍"
+                               FontSize="18"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,12,0"/>
+                    <TextBox x:Name="SearchBox"
+                             Grid.Column="1"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             FontSize="16"
+                             Foreground="{DynamicResource TextBrush}"
+                             CaretBrush="{DynamicResource TextBrush}"
+                             VerticalAlignment="Center"
+                             KeyDown="SearchBox_KeyDown">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <ScrollViewer x:Name="PART_ContentHost"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </Grid>
+            </Border>
+
+            <!-- Quick Links -->
+            <TextBlock Text="Quick Links"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Margin="0,0,0,16"/>
+
+            <WrapPanel x:Name="QuickLinksPanel" HorizontalAlignment="Center">
+                <!-- Quick links will be populated dynamically -->
+            </WrapPanel>
+
+            <!-- Recent History -->
+            <TextBlock Text="Recently Visited"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Margin="0,32,0,16"/>
+
+            <ItemsControl x:Name="RecentHistory">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+
+        <!-- Stats Footer -->
+        <StackPanel VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,32"
+                    Orientation="Horizontal">
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    CornerRadius="8"
+                    Padding="16,8"
+                    Margin="8,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🛡️" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <StackPanel>
+                        <TextBlock x:Name="AdsBlockedText"
+                                   Text="0 ads blocked"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                        <TextBlock Text="this session"
+                                   FontSize="10"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    CornerRadius="8"
+                    Padding="16,8"
+                    Margin="8,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🔒" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <StackPanel>
+                        <TextBlock x:Name="TrackersBlockedText"
+                                   Text="0 trackers blocked"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                        <TextBlock Text="this session"
+                                   FontSize="10"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

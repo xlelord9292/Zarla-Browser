@@ -1,0 +1,89 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+publish/
+out/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# Build
+*.msi
+*.msix
+*.msm
+*.msp
+*.appx
+*.appxbundle
+*.appxupload
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# User-specific files
+*.rsuser
+*.pubxml
+*.publishproj
+
+# Backup & merge files
+*.bak
+*.tmp
+*.temp
+*_i.c
+*_p.c
+*_h.h
+*.merge
+*.orig
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local env files
+.env
+.env.local
+*.local
+
+# WebView2 user data
+EBWebView/

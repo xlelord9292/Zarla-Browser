@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35"/>
+      <stop offset="50%" style="stop-color:#FF8B4C"/>
+      <stop offset="100%" style="stop-color:#FF4D2D"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect x="16" y="16" width="224" height="224" rx="50" ry="50" fill="url(#bgGradient)"/>
+  
+  <!-- Z letter -->
+  <path d="M 75 70 
+           L 181 70 
+           L 181 87.5 
+           L 102.5 170 
+           L 181 170 
+           L 181 187.5 
+           L 75 187.5 
+           L 75 170 
+           L 153.5 87.5 
+           L 75 87.5 
+           Z" 
+        fill="white"/>
+</svg>

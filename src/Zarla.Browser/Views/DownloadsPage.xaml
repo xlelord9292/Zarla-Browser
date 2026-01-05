@@ -1,0 +1,147 @@
+<UserControl x:Class="Zarla.Browser.Views.DownloadsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BackgroundBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SurfaceBrush}"
+                Padding="24,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Downloads"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Style="{StaticResource IconButton}"
+                        Content="Open Folder"
+                        Click="OpenFolder_Click"
+                        Margin="0,0,8,0"/>
+
+                <Button Grid.Column="2"
+                        Style="{StaticResource PrimaryButton}"
+                        Content="Clear Completed"
+                        Click="ClearCompleted_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Downloads List -->
+        <ScrollViewer Grid.Row="1" Padding="24">
+            <ItemsControl x:Name="DownloadsList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource SurfaceBrush}"
+                                CornerRadius="12"
+                                Padding="16"
+                                Margin="0,0,0,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- File Icon -->
+                                <Border Grid.Column="0"
+                                        Width="48" Height="48"
+                                        CornerRadius="8"
+                                        Background="{DynamicResource BackgroundBrush}"
+                                        Margin="0,0,16,0">
+                                    <TextBlock Text="{Binding FileIcon}"
+                                               FontSize="24"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- File Info -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding FileName}"
+                                               FontSize="14"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <TextBlock Text="{Binding FormattedSize}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Text=" • "
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Visibility="{Binding SpeedVisibility}"/>
+                                        <TextBlock Text="{Binding SpeedText}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Visibility="{Binding SpeedVisibility}"/>
+                                    </StackPanel>
+
+                                    <!-- Progress Bar -->
+                                    <Grid Margin="0,8,0,0" Visibility="{Binding ProgressVisibility}">
+                                        <ProgressBar Value="{Binding Progress}"
+                                                     Maximum="100"
+                                                     Height="4"
+                                                     Background="{DynamicResource BackgroundBrush}"
+                                                     Foreground="{DynamicResource AccentBrush}"/>
+                                    </Grid>
+
+                                    <!-- Status -->
+                                    <TextBlock Text="{Binding StatusText}"
+                                               FontSize="12"
+                                               Foreground="{Binding StatusColor}"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <!-- Actions -->
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <Button Style="{StaticResource IconButton}"
+                                            Content="📂"
+                                            ToolTip="Show in folder"
+                                            Click="ShowInFolder_Click"
+                                            Tag="{Binding}"/>
+                                    <Button Style="{StaticResource IconButton}"
+                                            Content="▶"
+                                            ToolTip="Open file"
+                                            Click="OpenFile_Click"
+                                            Tag="{Binding}"
+                                            Visibility="{Binding OpenVisibility}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Empty State -->
+        <StackPanel x:Name="EmptyState"
+                    Grid.Row="1"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Visibility="Collapsed">
+            <TextBlock Text="↓"
+                       FontSize="64"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock Text="No downloads yet"
+                       FontSize="18"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center"
+                       Margin="0,16,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
