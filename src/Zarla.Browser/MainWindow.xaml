@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:views="clr-namespace:Zarla.Browser.Views"
         Title="Zarla" Height="800" Width="1280"
         WindowState="Maximized"
         Background="{DynamicResource BackgroundBrush}">
@@ -159,6 +160,12 @@
                         ToolTip="Downloads (Ctrl+J)">
                     <TextBlock Text="↓" FontSize="18"/>
                 </Button>
+                <Button x:Name="AIButton"
+                        Style="{StaticResource IconButton}"
+                        Click="AIButton_Click"
+                        ToolTip="AI Assistant">
+                    <TextBlock Text="AI" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
+                </Button>
                 <Button Style="{StaticResource IconButton}"
                         Click="MenuButton_Click"
                         ToolTip="Menu">
@@ -180,9 +187,201 @@
             </ScrollViewer>
         </Border>
 
-        <!-- Browser Content -->
-        <Grid Grid.Row="3" x:Name="BrowserContent">
-            <!-- WebView2 instances will be added here -->
+        <!-- Browser Content Area with AI Panel -->
+        <Grid x:Name="BrowserAIGrid" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Browser Content -->
+            <Grid Grid.Column="0" x:Name="BrowserContent">
+                <!-- WebView2 instances will be added here -->
+            </Grid>
+
+            <!-- Integrated AI Panel -->
+            <Border x:Name="AIPanel"
+                    Grid.Column="1"
+                    Background="{DynamicResource BackgroundBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1,0,0,0"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header with Model Selector -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Zarla AI"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource TextBrush}"/>
+                                <!-- Model Dropdown -->
+                                <ComboBox x:Name="AIPanelModelCombo"
+                                          Style="{StaticResource ModernComboBox}"
+                                          Width="220"
+                                          Margin="0,8,0,0"
+                                          HorizontalAlignment="Left"
+                                          SelectionChanged="AIPanelModelCombo_SelectionChanged"/>
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Style="{StaticResource IconButton}"
+                                    Click="ClearAIChat_Click"
+                                    VerticalAlignment="Top"
+                                    ToolTip="Clear chat"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="🗑" FontSize="14"/>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Style="{StaticResource IconButton}"
+                                    Click="CloseAIPanel_Click"
+                                    VerticalAlignment="Top"
+                                    ToolTip="Close">
+                                <TextBlock Text="✕" FontSize="16" FontWeight="Bold"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Chat Content -->
+                    <ScrollViewer x:Name="AIChatScrollViewer"
+                                  Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Background="{DynamicResource BackgroundBrush}">
+                        <StackPanel x:Name="AIChatPanel" Margin="16">
+                            <!-- Welcome Message -->
+                            <Border x:Name="AIWelcomePanel"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    CornerRadius="12"
+                                    Padding="20"
+                                    Margin="0,0,0,16">
+                                <StackPanel>
+                                    <TextBlock Text="👋 Hey there!"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBlock Text="I'm your AI assistant. Ask me anything or use the quick actions below."
+                                               TextWrapping="Wrap"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="0,8,0,0"
+                                               LineHeight="20"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Loading State -->
+                            <Border x:Name="AILoadingPanel"
+                                    Visibility="Collapsed"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    CornerRadius="12"
+                                    Padding="16"
+                                    Margin="0,0,0,12"
+                                    HorizontalAlignment="Left"
+                                    MaxWidth="320">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="●●●"
+                                               FontSize="16"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="Thinking..."
+                                               FontSize="13"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="8,0,0,0"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Input Area -->
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="16">
+                        <StackPanel>
+                            <!-- Quick Actions -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Button Style="{StaticResource IconButton}"
+                                        Padding="10,6"
+                                        Margin="0,0,6,0"
+                                        Click="SummarizePage_Click"
+                                        ToolTip="Summarize current page">
+                                    <TextBlock Text="📝 Summarize" FontSize="12"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}"
+                                        Padding="10,6"
+                                        Margin="0,0,6,0"
+                                        Click="KeyPoints_Click"
+                                        ToolTip="Extract key points">
+                                    <TextBlock Text="📌 Key Points" FontSize="12"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}"
+                                        Padding="10,6"
+                                        Click="ExplainPage_Click"
+                                        ToolTip="Explain page content">
+                                    <TextBlock Text="💡 Explain" FontSize="12"/>
+                                </Button>
+                            </StackPanel>
+
+                            <!-- Input Box -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="AIInput"
+                                         Style="{StaticResource ModernTextBox}"
+                                         Background="{DynamicResource BackgroundBrush}"
+                                         KeyDown="AIInput_KeyDown"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="False"
+                                         MaxHeight="100"
+                                         VerticalScrollBarVisibility="Auto"/>
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Click="SendAIMessage_Click"
+                                        Margin="8,0,0,0"
+                                        Padding="16,10"
+                                        ToolTip="Send message">
+                                    <TextBlock Text="→" FontSize="16" FontWeight="Bold"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- Web Search Toggle and Usage Info -->
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox x:Name="AIWebSearchCheckbox"
+                                          Content="🌐 Search web for current info"
+                                          FontSize="11"
+                                          Foreground="{DynamicResource TextSecondaryBrush}"
+                                          VerticalContentAlignment="Center"/>
+                                <TextBlock x:Name="AIUsageText"
+                                           Grid.Column="1"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
         </Grid>
 
         <!-- Status Bar -->
@@ -310,6 +509,19 @@
                         </StackPanel>
                     </Button>
                     <Separator Background="{DynamicResource BorderBrush}" Margin="8,4"/>
+                    <Button Style="{StaticResource MenuButton}" Click="AIAssistant_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🤖" Width="24"/>
+                            <TextBlock Text="AI Assistant"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource MenuButton}" Click="Extensions_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🧩" Width="24"/>
+                            <TextBlock Text="Extensions"/>
+                        </StackPanel>
+                    </Button>
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="8,4"/>
                     <Button Style="{StaticResource MenuButton}" Click="Settings_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="⚙" Width="24"/>
@@ -329,6 +541,7 @@
         <!-- Find Bar -->
         <Border x:Name="FindBar"
                 Grid.Row="3"
+                Panel.ZIndex="100"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Right"
                 Margin="16"
@@ -448,5 +661,14 @@
                 </StackPanel>
             </Border>
         </Popup>
+
+        <!-- Save Password Popup (Chrome-like) -->
+        <Border x:Name="SavePasswordPopupContainer"
+                Visibility="Collapsed"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,90,100,0">
+            <views:SavePasswordPopup x:Name="SavePasswordPopup"/>
+        </Border>
     </Grid>
 </Window>

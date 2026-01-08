@@ -4,6 +4,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Zarla.Core.Data;
 using Zarla.Core.Data.Models;
+using Zarla.Core.Security;
 
 namespace Zarla.Browser.Services;
 
@@ -41,6 +42,18 @@ public partial class DownloadItem : ObservableObject
 
     [ObservableProperty]
     private string _speedText = string.Empty;
+    
+    [ObservableProperty]
+    private bool _isScanning;
+    
+    [ObservableProperty]
+    private string? _scanResult;
+    
+    [ObservableProperty]
+    private bool _isSafe = true;
+    
+    [ObservableProperty]
+    private string? _threatLabel;
 
     private DateTime _lastProgressUpdate;
     private long _lastReceivedBytes;
@@ -93,17 +106,20 @@ public class DownloadService
     private readonly Database _database;
     private readonly ObservableCollection<DownloadItem> _downloads = new();
     private readonly string _defaultDownloadPath;
+    private readonly SecurityScanner? _securityScanner;
 
     public ObservableCollection<DownloadItem> Downloads => _downloads;
 
     public event EventHandler<DownloadItem>? DownloadStarted;
     public event EventHandler<DownloadItem>? DownloadCompleted;
     public event EventHandler<DownloadItem>? DownloadFailed;
+    public event EventHandler<(DownloadItem Item, SecurityScanResult Result)>? ThreatDetected;
 
-    public DownloadService(Database database, string defaultDownloadPath)
+    public DownloadService(Database database, string defaultDownloadPath, SecurityScanner? securityScanner = null)
     {
         _database = database;
         _defaultDownloadPath = defaultDownloadPath;
+        _securityScanner = securityScanner;
 
         if (!Directory.Exists(_defaultDownloadPath))
             Directory.CreateDirectory(_defaultDownloadPath);
@@ -184,9 +200,76 @@ public class DownloadService
         await _database.CompleteDownloadAsync(downloadId, status);
 
         if (success)
+        {
             DownloadCompleted?.Invoke(this, item);
+            
+            // Scan file for threats if security scanner is available
+            if (_securityScanner != null && _securityScanner.Level == SecurityLevel.High)
+            {
+                await ScanDownloadedFile(item);
+            }
+        }
         else
+        {
             DownloadFailed?.Invoke(this, item);
+        }
+    }
+    
+    /// <summary>
+    /// Scan a downloaded file for threats using VirusTotal
+    /// </summary>
+    public async Task<SecurityScanResult?> ScanDownloadedFile(DownloadItem item)
+    {
+        if (_securityScanner == null || !File.Exists(item.FilePath))
+            return null;
+        
+        try
+        {
+            item.IsScanning = true;
+            item.ScanResult = "Scanning...";
+            
+            var result = await _securityScanner.ScanFileAsync(item.FilePath);
+            
+            item.IsScanning = false;
+            item.IsSafe = result.IsSafe;
+            
+            if (result.IsSafe)
+            {
+                if (result.VirusTotalResult?.IsUnknown == true)
+                {
+                    item.ScanResult = "✓ File not in database (likely safe)";
+                }
+                else
+                {
+                    item.ScanResult = "✓ Safe";
+                }
+            }
+            else
+            {
+                item.ScanResult = "⚠ THREAT DETECTED";
+                item.ThreatLabel = result.VirusTotalResult?.ThreatLabel ?? result.WarningMessage;
+                ThreatDetected?.Invoke(this, (item, result));
+            }
+            
+            return result;
+        }
+        catch (Exception ex)
+        {
+            item.IsScanning = false;
+            item.ScanResult = $"Scan error: {ex.Message}";
+            return null;
+        }
+    }
+    
+    /// <summary>
+    /// Manually scan a file
+    /// </summary>
+    public async Task<SecurityScanResult?> ScanFile(string filePath)
+    {
+        if (_securityScanner == null)
+            return null;
+        
+        return await _securityScanner.ScanFileAsync(filePath);
     }
 
     public void OpenFile(DownloadItem item)

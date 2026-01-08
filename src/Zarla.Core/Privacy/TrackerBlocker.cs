@@ -1,11 +1,9 @@
-using System.Text.RegularExpressions;
-
 namespace Zarla.Core.Privacy;
 
 public class TrackerBlocker
 {
     private readonly HashSet<string> _trackerDomains = new(StringComparer.OrdinalIgnoreCase);
-    private readonly List<Regex> _trackerPatterns = new();
+    private readonly HashSet<string> _trackerSubstrings = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _whitelistedDomains = new(StringComparer.OrdinalIgnoreCase);
     private bool _isEnabled = true;
 
@@ -110,18 +108,8 @@ public class TrackerBlocker
             "rrweb.io",
             "quantummetric.com",
             "glassbox.com",
-            "contentsquare.com",
-            "medallia.com",
-            "usabilla.com",
-            "qualtrics.com",
-
-            // Error tracking (when used for tracking)
-            "sentry.io",
-            "bugsnag.com",
-            "rollbar.com",
-            "raygun.io",
-            "trackjs.com",
-            "errorception.com"
+            "contentsquare.com"
+            // Note: Error tracking services like sentry.io are allowed as they're essential for site functionality
         };
 
         foreach (var domain in trackerDomains)
@@ -129,43 +117,19 @@ public class TrackerBlocker
             _trackerDomains.Add(domain);
         }
 
-        // Tracking URL patterns
-        var patterns = new[]
+        // Fast substring patterns (no regex)
+        var substrings = new[]
         {
-            @"[?&]utm_",
-            @"[?&]fbclid=",
-            @"[?&]gclid=",
-            @"[?&]msclkid=",
-            @"[?&]dclid=",
-            @"[?&]_ga=",
-            @"[?&]_gl=",
-            @"[?&]mc_[ce]id=",
-            @"[?&]oly_",
-            @"[?&]__hs",
-            @"[?&]mkt_tok=",
-            @"[?&]trk=",
-            @"[?&]clickid=",
-            @"[?&]affiliate",
-            @"[?&]ref_?=",
-            @"/collect\?",
-            @"/pageview",
-            @"/track[ing]?",
-            @"/event[s]?\?",
-            @"/log[ging]?\?",
-            @"/telemetry",
-            @"/metrics",
-            @"/beacon",
-            @"/__imp",
-            @"/pixel",
-            @"\.gif\?.*=",
-            @"/1x1\.",
-            @"/tr\?",
-            @"/v1/track"
+            "fbclid=",
+            "gclid=",
+            "msclkid=",
+            "/beacon?",
+            "/1x1."
         };
 
-        foreach (var pattern in patterns)
+        foreach (var s in substrings)
         {
-            _trackerPatterns.Add(new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled));
+            _trackerSubstrings.Add(s);
         }
     }
 
@@ -175,8 +139,19 @@ public class TrackerBlocker
 
         try
         {
-            var uri = new Uri(url);
-            var host = uri.Host.ToLowerInvariant();
+            // Fast host extraction without full Uri parsing
+            var hostStart = url.IndexOf("://");
+            if (hostStart < 0) return false;
+            hostStart += 3;
+
+            var hostEnd = url.IndexOf('/', hostStart);
+            if (hostEnd < 0) hostEnd = url.Length;
+
+            var host = url.Substring(hostStart, hostEnd - hostStart).ToLowerInvariant();
+
+            // Remove port if present
+            var portIdx = host.IndexOf(':');
+            if (portIdx > 0) host = host.Substring(0, portIdx);
 
             // Check whitelist
             if (IsWhitelisted(host)) return false;
@@ -191,10 +166,11 @@ public class TrackerBlocker
                 }
             }
 
-            // Check URL patterns
-            foreach (var pattern in _trackerPatterns)
+            // Fast substring check (no regex)
+            var lowerUrl = url.ToLowerInvariant();
+            foreach (var substring in _trackerSubstrings)
             {
-                if (pattern.IsMatch(url))
+                if (lowerUrl.Contains(substring))
                 {
                     BlockedCount++;
                     return true;

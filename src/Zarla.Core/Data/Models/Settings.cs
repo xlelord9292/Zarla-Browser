@@ -1,3 +1,6 @@
+using Zarla.Core.AI;
+using Zarla.Core.Security;
+
 namespace Zarla.Core.Data.Models;
 
 public class BrowserSettings
@@ -8,11 +11,28 @@ public class BrowserSettings
     public string DownloadPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
     public bool AskBeforeDownload { get; set; } = false;
 
+    // AI Settings
+    public bool AIEnabled { get; set; } = true;
+    public string SelectedAIModel { get; set; } = "meta-llama/llama-4-scout-17b-16e-instruct";
+    public List<CustomModel> CustomModels { get; set; } = new();
+    public string? AIBypassCode { get; set; }
+
+    // Security Settings
+    public SecurityLevel SecurityLevel { get; set; } = SecurityLevel.Medium;
+    public bool EnableSecurityScanning { get; set; } = true;
+    public bool ShowSecurityWarnings { get; set; } = true;
+    public bool BlockDangerousSites { get; set; } = true;
+
     // Appearance
     public string Theme { get; set; } = "Dark"; // Dark, Light, System
     public bool ShowBookmarksBar { get; set; } = true;
     public bool ShowHomeButton { get; set; } = true;
     public double ZoomLevel { get; set; } = 100;
+
+    // Passwords
+    public bool EnablePasswordAutofill { get; set; } = true;
+    public bool OfferToSavePasswords { get; set; } = true;
+    public bool AutoSignIn { get; set; } = false;
 
     // Privacy
     public bool EnableAdBlocker { get; set; } = true;

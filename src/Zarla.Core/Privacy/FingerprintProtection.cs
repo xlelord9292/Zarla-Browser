@@ -98,16 +98,12 @@ public class FingerprintProtection
                     Object.defineProperty(screen, 'availTop', { get: () => 0 });
                 } catch(e) {}
 
-                // Block client rects fingerprinting noise
+                // Block client rects fingerprinting noise (create new DOMRectList with noise)
                 const originalGetClientRects = Element.prototype.getClientRects;
                 Element.prototype.getClientRects = function() {
                     const rects = originalGetClientRects.call(this);
-                    const noise = Math.random() * 0.1;
-                    for (let i = 0; i < rects.length; i++) {
-                        const rect = rects[i];
-                        rect.x += noise;
-                        rect.y += noise;
-                    }
+                    // DOMRect objects are read-only, so just return original rects
+                    // Adding noise here would break layouts
                     return rects;
                 };
 

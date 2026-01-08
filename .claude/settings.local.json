@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)",
+      "Bash(timeout 5 dotnet run:*)",
+      "Bash(timeout 10 dotnet run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd Zarla Extensions, AI assistant, password manager & major improvements\n\nFeatures:\n- Zarla Extensions: Block-based extension builder with 8 built-in templates\n- AI Assistant: Integrated side panel with Groq-powered chat, page summarization\n- Password Manager: Encrypted storage with autofill support\n- Security Scanner: Download threat detection\n\nFixes:\n- AI panel now integrated in browser GUI \\(no longer breaks out\\)\n- Optimized ad/tracker blocking \\(removed slow regex\\)\n- Fixed fingerprint protection DOMRect errors\n\nUpdated README with all new features\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

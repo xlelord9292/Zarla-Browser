@@ -1,116 +1,107 @@
 # Zarla Browser
 
 <p align="center">
-  <img src="assets/icons/zarla-logo.svg" width="128" height="128" alt="Zarla Logo">
+  <img src="assets/icons/zarla-logo.svg" width="140" height="140" alt="Zarla Logo">
+</p>
+
+<h3 align="center">The Browser That Respects You</h3>
+
+<p align="center">
+  <strong>Fast. Private. Powerful.</strong><br>
+  A next-gen browser built with C#, WPF & Chromium
 </p>
 
 <p align="center">
-  <strong>A fast, lightweight, privacy-focused web browser</strong><br>
-  Built with C#, WPF, and WebView2 (Chromium-based)
+  <a href="https://github.com/xlelord9292/Zarla-Browser/releases"><img src="https://img.shields.io/badge/Download-Latest-blue?style=for-the-badge" alt="Download"></a>
+  <img src="https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows" alt="Windows">
+  <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet" alt=".NET 8">
 </p>
 
-<p align="center">
-  <a href="https://github.com/xlelord9292/Zarla-Browser/releases">Download</a> •
-  <a href="#features">Features</a> •
-  <a href="#building">Building</a> •
-  <a href="#keyboard-shortcuts">Shortcuts</a>
-</p>
+---
+
+## Why Zarla?
+
+Most browsers spy on you, slow you down, and bombard you with ads. **Zarla is different.**
+
+- No data collection. Ever.
+- Blocks ads & trackers by default
+- Built-in AI assistant powered by Groq
+- Create your own extensions with zero coding
+- Lightweight & blazing fast
 
 ---
 
 ## Features
 
-### 🔒 Privacy First
-- **Built-in Ad Blocker** - Blocks ads and popups
-- **Tracker Blocker** - Prevents cross-site tracking
-- **Fingerprint Protection** - Randomizes browser fingerprint
-- **Do Not Track** - Sends DNT and GPC headers
-- **No Telemetry** - Zero data collection
+### Privacy & Security
 
-### ⚡ Blazing Fast
-- **Tab Suspension** - Auto-suspends inactive tabs
-- **Memory Management** - Smart memory optimization
-- **Hardware Acceleration** - GPU-powered rendering
+| Feature | Description |
+|---------|-------------|
+| **Ad Blocker** | Blocks ads, popups, and annoyances out of the box |
+| **Tracker Blocker** | Stops cross-site tracking and analytics |
+| **Fingerprint Protection** | Randomizes your browser fingerprint |
+| **Password Manager** | Secure, encrypted password storage with autofill |
+| **Security Scanner** | Scans downloads for malware and threats |
+| **Zero Telemetry** | We don't collect ANY data. Period. |
 
-### 🎨 Modern UI
-- **Dark & Light Themes** - Beautiful, modern interface
-- **Tab Drag & Drop** - Reorder tabs easily
-- **Keyboard Shortcuts** - Full keyboard navigation
+### AI Assistant
 
-### 🔧 Network Settings
-- **DNS Selection** - System, Cloudflare, Quad9, or Google DNS
-- **Proxy Support** - Configure custom proxy servers
+| Feature | Description |
+|---------|-------------|
+| **Built-in AI Chat** | Ask questions, get instant answers |
+| **Page Summarization** | Summarize any webpage with one click |
+| **Key Points Extraction** | Pull out the important info fast |
+| **Web Search Integration** | AI can search the web for current info |
+| **Powered by Groq** | Lightning-fast LLaMA 3 responses |
+
+### Zarla Extensions
+
+| Feature | Description |
+|---------|-------------|
+| **Block-Based Builder** | Create extensions visually - no coding needed |
+| **Built-in Templates** | Cookie blocker, dark mode, YouTube enhancer & more |
+| **Import/Export** | Share extensions as `.zarla` files |
+| **Site-Specific** | Run extensions only on sites you choose |
+
+**Built-in Templates:**
+- Cookie Consent Blocker - Auto-dismiss annoying popups
+- Dark Mode Everywhere - Force dark mode on any site
+- Reading Mode - Clean, distraction-free reading
+- YouTube Enhancer - Hide shorts & distracting elements
+- Twitter/X Cleaner - Hide trending, "who to follow"
+- Reddit Enhancer - Hide promoted posts
+- Focus Mode - Hide chat widgets & notifications
+
+### Performance
+
+| Feature | Description |
+|---------|-------------|
+| **Tab Suspension** | Auto-suspends inactive tabs to save memory |
+| **Smart Memory Management** | Optimizes RAM usage automatically |
+| **Hardware Acceleration** | GPU-powered rendering for smooth scrolling |
+| **Fast Startup** | Opens in under 2 seconds |
+
+### Modern UI
+
+| Feature | Description |
+|---------|-------------|
+| **Dark & Light Themes** | Beautiful, modern interface |
+| **Tab Drag & Drop** | Reorder tabs with ease |
+| **Integrated AI Panel** | Side panel that doesn't get in the way |
+| **Custom New Tab** | Quick access to your favorites |
 
 ---
 
 ## Quick Start
 
-### Option 1: Download Installer (Recommended)
-Download the latest `ZarlaSetup-1.0.0.exe` from [Releases](https://github.com/xlelord9292/Zarla-Browser/releases)
+### Download (Recommended)
+Grab the latest installer from [Releases](https://github.com/xlelord9292/Zarla-Browser/releases)
 
-### Option 2: Run from Source
+### Build from Source
 ```powershell
 git clone https://github.com/xlelord9292/Zarla-Browser.git
 cd Zarla-Browser
-dotnet run --project src/Zarla.Browser
-```
-
----
-
-## Building
-
-### Prerequisites
-- **Windows 10/11** (64-bit)
-- **.NET 8 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **NSIS** (optional, for installer) - [Download](https://nsis.sourceforge.io/Download)
-
-### Install Prerequisites
-```powershell
-# Install .NET 8 SDK
-winget install Microsoft.DotNet.SDK.8
-
-# Install NSIS (optional, for creating installer)
-winget install NSIS.NSIS
-```
-
-### Build Commands
-
-| Command | Description |
-|---------|-------------|
-| `.\build.ps1` | Build in Debug mode |
-| `.\build.ps1 -Release` | Build in Release mode + publish |
-| `.\build.ps1 -Installer` | Build + create setup installer |
-| `.\build.ps1 -Clean` | Clean all build artifacts |
-
-### Step-by-Step: Create Installer
-
-```powershell
-# 1. Clone the repository
-git clone https://github.com/xlelord9292/Zarla-Browser.git
-cd Zarla-Browser
-
-# 2. Build the installer (includes Release build)
-.\build.ps1 -Installer
-
-# 3. Find your installer at:
-#    installer\ZarlaSetup-1.0.0.exe
-```
-
-### Manual Build (without build script)
-
-```powershell
-# Build
-dotnet build -c Release
-
-# Run
-dotnet run --project src/Zarla.Browser -c Release
-
-# Publish standalone executable
-dotnet publish src/Zarla.Browser/Zarla.Browser.csproj -c Release -r win-x64 -f net8.0-windows --self-contained -o publish/win-x64
-
-# Create installer manually (requires NSIS)
-cd installer
-makensis zarla-installer.nsi
+dotnet run --project src/Zarla.Browser --framework net8.0-windows
 ```
 
 ---
@@ -129,9 +120,7 @@ makensis zarla-installer.nsi
 | `Ctrl+H` | History |
 | `Ctrl+J` | Downloads |
 | `F12` | Developer tools |
-| `Ctrl++` | Zoom in |
-| `Ctrl+-` | Zoom out |
-| `Ctrl+0` | Reset zoom |
+| `Ctrl++` / `Ctrl+-` | Zoom in/out |
 
 ---
 
@@ -144,7 +133,45 @@ makensis zarla-installer.nsi
 | `zarla://history` | Browsing history |
 | `zarla://bookmarks` | Bookmark manager |
 | `zarla://downloads` | Download manager |
-| `zarla://about` | About Zarla |
+| `zarla://extensions` | Zarla Extensions |
+| `zarla://passwords` | Password manager |
+| `zarla://docs` | Documentation |
+
+---
+
+## Building
+
+### Prerequisites
+- **Windows 10/11** (64-bit)
+- **.NET 8 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/8.0)
+
+### Setup API Key (Required for AI Features)
+
+To use the AI assistant and security scanning features, you need a free Groq API key:
+
+1. Get a free API key from [Groq Console](https://console.groq.com/keys)
+2. Set the environment variable:
+
+```powershell
+# Windows (PowerShell) - Permanent
+[Environment]::SetEnvironmentVariable("GROQ_API_KEY", "your-api-key-here", "User")
+
+# Or temporary (current session only)
+$env:GROQ_API_KEY = "your-api-key-here"
+```
+
+### Build Commands
+
+```powershell
+# Quick build & run
+dotnet run --project src/Zarla.Browser --framework net8.0-windows
+
+# Release build
+.\build.ps1 -Release
+
+# Create installer
+.\build.ps1 -Installer
+```
 
 ---
 
@@ -153,41 +180,29 @@ makensis zarla-installer.nsi
 ```
 Zarla/
 ├── src/
-│   ├── Zarla.Browser/     # Main WPF application
-│   │   ├── Views/         # Settings, History, etc.
-│   │   ├── Services/      # Tab manager, downloads
-│   │   └── Themes/        # Dark and Light themes
-│   └── Zarla.Core/        # Core library
-│       ├── Privacy/       # Ad/tracker blocking
-│       └── Performance/   # Tab suspension, memory
-├── assets/icons/          # Application icons
-├── installer/             # NSIS installer script
-├── build.ps1              # Build script
-└── Zarla.sln              # Solution file
-```
-
----
-
-## Configuration
-
-Settings are stored in:
-```
-%LOCALAPPDATA%\Zarla\settings.json
-```
-
-Browsing data (history, bookmarks):
-```
-%LOCALAPPDATA%\Zarla\zarla.db
+│   ├── Zarla.Browser/        # Main WPF application
+│   │   ├── Views/            # Settings, Extensions, Passwords
+│   │   ├── Services/         # Tab manager, downloads, extensions
+│   │   └── Themes/           # Dark and Light themes
+│   └── Zarla.Core/           # Core library
+│       ├── AI/               # AI service & usage tracking
+│       ├── Privacy/          # Ad/tracker/fingerprint blocking
+│       ├── Security/         # Password manager, scanner
+│       ├── Extensions/       # Zarla extension system
+│       └── Performance/      # Tab suspension, memory
+├── assets/                   # Icons and resources
+├── installer/                # NSIS installer
+└── build.ps1                 # Build script
 ```
 
 ---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/cool-feature`)
+3. Commit your changes (`git commit -m 'Add cool feature'`)
+4. Push to the branch (`git push origin feature/cool-feature`)
 5. Open a Pull Request
 
 ---
@@ -199,5 +214,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <strong>Zarla</strong> - Browse Fast. Browse Private. Browse Free.
+  <strong>Zarla</strong><br>
+  <em>Browse Fast. Browse Private. Browse Free.</em>
+</p>
+
+<p align="center">
+  Made with passion for a better internet.
 </p>

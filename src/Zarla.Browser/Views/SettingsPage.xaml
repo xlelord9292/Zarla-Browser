@@ -37,18 +37,27 @@
                                      Content="🎨  Appearance"
                                      Checked="NavButton_Checked" Tag="Appearance"/>
                         <RadioButton x:Name="PrivacyNav" Style="{StaticResource NavButton}" 
-                                     Content="🔒  Privacy &amp; Security"
+                                     Content="🔒  Privacy"
                                      Checked="NavButton_Checked" Tag="Privacy"/>
+                        <RadioButton x:Name="SecurityNav" Style="{StaticResource NavButton}"
+                                     Content="🛡️  Security"
+                                     Checked="NavButton_Checked" Tag="Security"/>
+                        <RadioButton x:Name="PasswordsNav" Style="{StaticResource NavButton}"
+                                     Content="🔑  Passwords"
+                                     Checked="NavButton_Checked" Tag="Passwords"/>
                         <RadioButton x:Name="NetworkNav" Style="{StaticResource NavButton}" 
                                      Content="🌐  Network"
                                      Checked="NavButton_Checked" Tag="Network"/>
                         <RadioButton x:Name="PerformanceNav" Style="{StaticResource NavButton}" 
                                      Content="⚡  Performance"
                                      Checked="NavButton_Checked" Tag="Performance"/>
-                        <RadioButton x:Name="DataNav" Style="{StaticResource NavButton}" 
+                        <RadioButton x:Name="DataNav" Style="{StaticResource NavButton}"
                                      Content="💾  Data"
                                      Checked="NavButton_Checked" Tag="Data"/>
-                        <RadioButton x:Name="AboutNav" Style="{StaticResource NavButton}" 
+                        <RadioButton x:Name="AINav" Style="{StaticResource NavButton}"
+                                     Content="🤖  AI"
+                                     Checked="NavButton_Checked" Tag="AI"/>
+                        <RadioButton x:Name="AboutNav" Style="{StaticResource NavButton}"
                                      Content="ℹ️  About"
                                      Checked="NavButton_Checked" Tag="About"/>
                     </StackPanel>
@@ -208,7 +217,7 @@
 
                 <!-- Privacy Section -->
                 <StackPanel x:Name="PrivacySection" Visibility="Collapsed">
-                    <TextBlock Text="Privacy &amp; Security"
+                    <TextBlock Text="Privacy"
                                FontSize="28"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextBrush}"
@@ -307,6 +316,393 @@
                                           Checked="ClearOnExitCheckbox_Changed"
                                           Unchecked="ClearOnExitCheckbox_Changed"/>
                             </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Security Section -->
+                <StackPanel x:Name="SecuritySection" Visibility="Collapsed">
+                    <TextBlock Text="Security"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Configure security levels and threat protection"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,0,24"/>
+
+                    <!-- Security Level -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Security Level"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Choose how aggressively Zarla protects you from threats"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Margin="0,0,0,16"/>
+
+                            <StackPanel>
+                                <RadioButton x:Name="SecurityLowRadio" 
+                                             Style="{StaticResource SettingsRadioButton}"
+                                             GroupName="SecurityLevel"
+                                             Checked="SecurityLevel_Checked">
+                                    <StackPanel Margin="8,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Low" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                            <Border Background="#3D5A3D" CornerRadius="4" Padding="6,2" Margin="8,0,0,0">
+                                                <TextBlock Text="Basic" Foreground="#8FBC8F" FontSize="10"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="Block only known malicious sites. Best for experienced users." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton x:Name="SecurityMediumRadio" 
+                                             Style="{StaticResource SettingsRadioButton}"
+                                             GroupName="SecurityLevel"
+                                             IsChecked="True"
+                                             Checked="SecurityLevel_Checked">
+                                    <StackPanel Margin="8,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Medium" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                            <Border Background="#4A4A2A" CornerRadius="4" Padding="6,2" Margin="8,0,0,0">
+                                                <TextBlock Text="Recommended" Foreground="#DAA520" FontSize="10"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="Block known threats + suspicious URL patterns. Balanced protection." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton x:Name="SecurityHighRadio" 
+                                             Style="{StaticResource SettingsRadioButton}"
+                                             GroupName="SecurityLevel"
+                                             Checked="SecurityLevel_Checked">
+                                    <StackPanel Margin="8,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="High" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                            <Border Background="#4A2A4A" CornerRadius="4" Padding="6,2" Margin="8,0,0,0">
+                                                <TextBlock Text="AI Powered" Foreground="#9370DB" FontSize="10"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="All protections + AI scanning for phishing, typosquatting, and suspicious content. Maximum security." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                    </StackPanel>
+                                </RadioButton>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AI Security Info -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock Text="🤖" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="AI Security Scanner"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           VerticalAlignment="Center"/>
+                                <Border Background="#2A4A2A" CornerRadius="4" Padding="8,4" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="✓ Free Forever" Foreground="#90EE90" FontSize="11" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" LineHeight="20">
+                                When High security is enabled, Zarla uses AI to scan websites in real-time:
+                            </TextBlock>
+                            <StackPanel Margin="12,12,0,0">
+                                <TextBlock Text="• Detect typosquatting (e.g., g00gle.com, amaz0n.com)" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Identify phishing pages mimicking legitimate sites" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Analyze page content for suspicious patterns" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Detect credential harvesting attempts" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Block known scam and malware domains" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- VirusTotal Info -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock Text="🛡️" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="VirusTotal Integration"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           VerticalAlignment="Center"/>
+                                <Border Background="#3D2A4A" CornerRadius="4" Padding="8,4" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="High Security Only" Foreground="#DDA0DD" FontSize="11" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" LineHeight="20">
+                                High security level includes VirusTotal scanning powered by 70+ antivirus engines:
+                            </TextBlock>
+                            <StackPanel Margin="12,12,0,0">
+                                <TextBlock Text="• Scan URLs against 70+ security vendors" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Scan downloaded files for malware" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Detect viruses, trojans, ransomware" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                                <TextBlock Text="• Automatic threat alerts with option to delete" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4"/>
+                            </StackPanel>
+                            <Border Background="#2D1E2D" CornerRadius="8" Padding="12" Margin="0,16,0,0">
+                                <StackPanel>
+                                    <TextBlock TextWrapping="Wrap" Foreground="#DDA0DD" FontSize="12">
+                                        📊 Free tier limits: 4 lookups/min • 500/day • 15.5K/month
+                                    </TextBlock>
+                                    <TextBlock x:Name="VTUsageText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Security Options -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Security Options"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- Show Security Warnings -->
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Show Security Warnings" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Display warning page when threats are detected" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SecurityWarningsCheckbox"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernToggle}"
+                                          IsChecked="True"
+                                          Checked="SecurityWarningsCheckbox_Changed"
+                                          Unchecked="SecurityWarningsCheckbox_Changed"/>
+                            </Grid>
+
+                            <!-- Block Dangerous Sites -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Block Dangerous Sites" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Automatically block access to high-risk sites" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="BlockDangerousSitesCheckbox"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernToggle}"
+                                          IsChecked="True"
+                                          Checked="BlockDangerousSitesCheckbox_Changed"
+                                          Unchecked="BlockDangerousSitesCheckbox_Changed"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Documentation Link -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Learn More" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock Text="View documentation about security codes and features" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <Button x:Name="ViewDocsButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ModernButton}"
+                                    Content="📚  View Docs"
+                                    Click="ViewDocsButton_Click"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Passwords Section -->
+                <StackPanel x:Name="PasswordsSection" Visibility="Collapsed">
+                    <TextBlock Text="Passwords"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Manage your saved passwords and autofill settings"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,0,24"/>
+
+                    <!-- Open Password Manager -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Password Manager" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock Text="View and manage all your saved passwords" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <Button x:Name="OpenPasswordManagerButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Content="🔐  Open Passwords"
+                                    Click="OpenPasswordManagerButton_Click"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Autofill Settings -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Autofill Settings"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- Enable Autofill -->
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Enable Password Autofill" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Automatically fill in passwords on login pages" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="PasswordAutofillCheckbox"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernToggle}"
+                                          Checked="PasswordAutofillCheckbox_Changed"
+                                          Unchecked="PasswordAutofillCheckbox_Changed"/>
+                            </Grid>
+
+                            <!-- Offer to Save Passwords -->
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Offer to Save Passwords" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Prompt to save new passwords when you sign in" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="OfferSavePasswordsCheckbox"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernToggle}"
+                                          Checked="OfferSavePasswordsCheckbox_Changed"
+                                          Unchecked="OfferSavePasswordsCheckbox_Changed"/>
+                            </Grid>
+
+                            <!-- Auto Sign-in -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Auto Sign-in" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Automatically sign in to sites when only one account is saved" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="AutoSignInCheckbox"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernToggle}"
+                                          Checked="AutoSignInCheckbox_Changed"
+                                          Unchecked="AutoSignInCheckbox_Changed"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Password Stats -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="🔒" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Password Security"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" LineHeight="20">
+                                Your passwords are encrypted using AES-256-GCM encryption with a master password derived using PBKDF2 (100,000 iterations). Passwords are stored locally on your device and never sent to any server.
+                            </TextBlock>
+                            <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="8" Padding="16" Margin="0,16,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock x:Name="SavedPasswordsCount" Text="0" FontSize="24" FontWeight="Bold" Foreground="#8ab4f8" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Saved" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                        <TextBlock Text="AES-256" FontSize="18" FontWeight="Bold" Foreground="#55ff88" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Encryption" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                        <TextBlock Text="Local" FontSize="18" FontWeight="Bold" Foreground="#ffaa55" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Storage" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Import/Export -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24">
+                        <StackPanel>
+                            <TextBlock Text="Import &amp; Export"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Backup or restore your passwords"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Margin="0,0,0,16"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="ExportPasswordsButton"
+                                        Style="{StaticResource ModernButton}"
+                                        Content="📤  Export"
+                                        Click="ExportPasswordsButton_Click"
+                                        Margin="0,0,12,0"/>
+                                <Button x:Name="ImportPasswordsButton"
+                                        Style="{StaticResource ModernButton}"
+                                        Content="📥  Import"
+                                        Click="ImportPasswordsButton_Click"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -603,6 +999,251 @@
                                         Content="🗑️  Clear Data"
                                         Click="ClearDataButton_Click"/>
                             </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- AI Section -->
+                <StackPanel x:Name="AISection" Visibility="Collapsed">
+                    <TextBlock Text="AI Assistant"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Configure AI-powered features"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,0,24"/>
+
+                    <!-- AI Enable/Disable -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Enable AI Features" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Use AI to summarize pages, answer questions, and more" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="AIEnabledCheckbox"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernToggle}"
+                                          Checked="AIEnabledCheckbox_Changed"
+                                          Unchecked="AIEnabledCheckbox_Changed"/>
+                            </Grid>
+
+                            <!-- Model Selection -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="280"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="AI Model" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="Select which model to use for AI features" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <ComboBox x:Name="AIModelCombo"
+                                          Grid.Column="1"
+                                          Style="{StaticResource ModernComboBox}"
+                                          SelectionChanged="AIModelCombo_SelectionChanged"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Usage Limits -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Usage Limits"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Daily limits reset every 24 hours"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- Usage Stats -->
+                            <Border Background="{DynamicResource BackgroundBrush}"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,16">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock x:Name="UsageStatsText"
+                                                   Text="Loading usage stats..."
+                                                   Foreground="{DynamicResource TextBrush}"
+                                                   FontSize="14"/>
+                                        <TextBlock x:Name="UsageResetText"
+                                                   Text=""
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   FontSize="12"
+                                                   Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <Border x:Name="UnlimitedBadge"
+                                            Grid.Column="1"
+                                            Background="#1a5c3a"
+                                            CornerRadius="12"
+                                            Padding="12,6"
+                                            Visibility="Collapsed">
+                                        <TextBlock Text="UNLIMITED"
+                                                   FontSize="11"
+                                                   FontWeight="Bold"
+                                                   Foreground="#55ff55"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Bypass Code -->
+                            <TextBlock Text="Bypass Code"
+                                       FontSize="14"
+                                       FontWeight="Medium"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,8"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="BypassCodeTextBox"
+                                         Style="{StaticResource ModernTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <Button x:Name="ActivateBypassButton"
+                                        Grid.Column="1"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Content="Activate"
+                                        Click="ActivateBypassButton_Click"/>
+                            </Grid>
+                            <TextBlock Text="Enter a valid code for unlimited AI usage"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Custom Models -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Custom Models"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBlock Text="Add your own AI models with custom API keys"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <Button Style="{StaticResource PrimaryButton}"
+                                        Grid.Column="1"
+                                        Content="+ Add Model"
+                                        Click="AddCustomModelButton_Click"/>
+                            </Grid>
+
+                            <!-- Custom Models List -->
+                            <StackPanel x:Name="CustomModelsPanel">
+                                <!-- Custom models will be added here -->
+                            </StackPanel>
+
+                            <TextBlock x:Name="NoCustomModelsText"
+                                       Text="No custom models added yet"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontStyle="Italic"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Model Info -->
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="12"
+                            Padding="24">
+                        <StackPanel>
+                            <TextBlock Text="Available Models"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- GPT-OSS 120B -->
+                            <Border Background="{DynamicResource BackgroundBrush}"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="GPT-OSS 120B" FontSize="14" FontWeight="Medium" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Powerful 120B parameter model for complex tasks" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <Border Background="#2d1e3a" CornerRadius="6" Padding="8,4" VerticalAlignment="Center">
+                                        <TextBlock Text="10/day" FontSize="11" Foreground="#b388ff"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- GPT-OSS 20B -->
+                            <Border Background="{DynamicResource BackgroundBrush}"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="GPT-OSS 20B" FontSize="14" FontWeight="Medium" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Balanced 20B model for general use" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <Border Background="#2d1e3a" CornerRadius="6" Padding="8,4" VerticalAlignment="Center">
+                                        <TextBlock Text="25/day" FontSize="11" Foreground="#b388ff"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Llama 4 Scout -->
+                            <Border Background="{DynamicResource BackgroundBrush}"
+                                    CornerRadius="8"
+                                    Padding="16">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Llama 4 Scout 17B" FontSize="14" FontWeight="Medium" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Fast and efficient instruction-following model" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <Border Background="#1a3a2d" CornerRadius="6" Padding="8,4" VerticalAlignment="Center">
+                                        <TextBlock Text="30/day" FontSize="11" Foreground="#55ff88"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
                         </StackPanel>
                     </Border>
                 </StackPanel>

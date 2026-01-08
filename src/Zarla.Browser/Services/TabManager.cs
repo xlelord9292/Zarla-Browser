@@ -44,6 +44,9 @@ public partial class BrowserTab : ObservableObject
     [ObservableProperty]
     private bool _isPlaying;
 
+    [ObservableProperty]
+    private object? _tag;
+
     public DateTime CreatedAt { get; } = DateTime.UtcNow;
     public DateTime LastActiveAt { get; set; } = DateTime.UtcNow;
 }
