@@ -1,7 +1,9 @@
 using System.IO;
 using System.Windows;
 using Zarla.Browser.Services;
+using Zarla.Core.Config;
 using Zarla.Core.Data;
+using Zarla.Core.Updates;
 
 namespace Zarla.Browser;
 
@@ -10,6 +12,7 @@ public partial class App : Application
     public static Database Database { get; private set; } = null!;
     public static SettingsService Settings { get; private set; } = null!;
     public static string UserDataFolder { get; private set; } = null!;
+    public static UpdateService? UpdateService { get; private set; }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -23,9 +26,22 @@ public partial class App : Application
         if (!Directory.Exists(UserDataFolder))
             Directory.CreateDirectory(UserDataFolder);
 
+        // Initialize config system
+        ZarlaConfig.Initialize(UserDataFolder);
+
+        // Check if an update was just applied and update config version accordingly
+        ZarlaConfig.CheckAndApplyPendingVersionUpdate(UserDataFolder);
+
         // Initialize services
         Database = new Database();
         Settings = new SettingsService();
+
+        // Initialize update service
+        UpdateService = new UpdateService(UserDataFolder);
+        UpdateService.CleanupOldUpdates();
+
+        // Don't auto-check updates on startup - let user manually check in Settings
+        // This prevents background crashes from failed update checks
 
         // Apply theme
         ApplyTheme(Settings.CurrentSettings.Theme);

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net8.0-windows;net9.0-windows</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ZarlaUpdater</AssemblyName>
+    <Version>1.0.1</Version>
+    <Company>Zarla</Company>
+    <Product>Zarla Browser Updater</Product>
+    <Description>Zarla Browser Update Utility</Description>
+  </PropertyGroup>
+
+</Project>

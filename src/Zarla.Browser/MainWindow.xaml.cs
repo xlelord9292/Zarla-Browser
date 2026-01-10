@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
+using System.Text;
 using Zarla.Browser.Services;
 using Zarla.Browser.Views;
 using Zarla.Core.Data.Models;
@@ -14,6 +15,8 @@ using Zarla.Core.Performance;
 using Zarla.Core.AI;
 using Zarla.Core.Security;
 using Zarla.Core.Extensions;
+using Zarla.Core.Config;
+using Zarla.Core.Features;
 
 namespace Zarla.Browser;
 
@@ -37,7 +40,12 @@ public partial class MainWindow : Window
     // AI Services
     private AIService? _aiService;
     private AIUsageTracker? _aiUsageTracker;
-    private static readonly string GroqApiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY") ?? "";
+    private static string GetAIApiKey()
+    {
+        var config = ZarlaConfig.Instance;
+        // Try encrypted key first, then fall back to environment variable GROQ_API_KEY
+        return SecureStorage.GetApiKey(config.EncryptedAIApiKey, "GROQ_API_KEY");
+    }
 
     // Tab drag-drop support
     private Border? _draggedTab;
@@ -128,7 +136,7 @@ public partial class MainWindow : Window
         _downloadService.ThreatDetected += OnDownloadThreatDetected;
 
         // Initialize AI services
-        _aiService = new AIService(GroqApiKey);
+        _aiService = new AIService(GetAIApiKey(), ZarlaConfig.Instance.AIApiEndpoint);
         _aiUsageTracker = new AIUsageTracker(App.UserDataFolder);
 
         // Set bypass code if saved
@@ -384,6 +392,11 @@ public partial class MainWindow : Window
         }
     }
 
+    // Store original window state for fullscreen toggle
+    private WindowState _previousWindowState = WindowState.Normal;
+    private WindowStyle _previousWindowStyle = WindowStyle.SingleBorderWindow;
+    private bool _isFullScreen = false;
+
     private void ConfigureWebView(WebView2 webView, BrowserTab tab)
     {
         var settings = webView.CoreWebView2.Settings;
@@ -413,6 +426,9 @@ public partial class MainWindow : Window
         webView.CoreWebView2.NewWindowRequested += (s, e) => OnNewWindowRequested(e);
         webView.CoreWebView2.DownloadStarting += (s, e) => OnDownloadStarting(e);
         webView.CoreWebView2.StatusBarTextChanged += (s, e) => OnStatusBarTextChanged(webView.CoreWebView2.StatusBarText);
+
+        // Handle fullscreen (YouTube, etc.)
+        webView.CoreWebView2.ContainsFullScreenElementChanged += (s, e) => OnFullScreenChanged(webView);
 
         // Request filtering for ad/tracker blocking
         webView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
@@ -1289,6 +1305,58 @@ public partial class MainWindow : Window
         StatusText.Text = text;
     }
 
+    private void OnFullScreenChanged(WebView2 webView)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (webView.CoreWebView2.ContainsFullScreenElement)
+            {
+                // Enter fullscreen mode
+                _previousWindowState = WindowState;
+                _previousWindowStyle = WindowStyle;
+                _isFullScreen = true;
+
+                // Hide all UI elements except the browser content
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Normal; // Reset first to ensure proper maximization
+                WindowState = WindowState.Maximized;
+
+                // Hide browser chrome - find elements by name
+                if (FindName("TabBarRow") is FrameworkElement tabBar) tabBar.Visibility = Visibility.Collapsed;
+                if (FindName("NavBarRow") is FrameworkElement navBar) navBar.Visibility = Visibility.Collapsed;
+                if (FindName("BookmarksBar") is FrameworkElement bookmarks) bookmarks.Visibility = Visibility.Collapsed;
+                if (FindName("FindBar") is FrameworkElement findBar) findBar.Visibility = Visibility.Collapsed;
+                if (FindName("StatusBarRow") is FrameworkElement statusBar) statusBar.Visibility = Visibility.Collapsed;
+
+                // Close AI panel if open
+                if (AIPanel.Visibility == Visibility.Visible)
+                {
+                    AIPanel.Visibility = Visibility.Collapsed;
+                    if (AIPanel.Parent is Grid parentGrid && parentGrid.ColumnDefinitions.Count > 1)
+                    {
+                        parentGrid.ColumnDefinitions[1].Width = new GridLength(0);
+                    }
+                }
+            }
+            else
+            {
+                // Exit fullscreen mode
+                _isFullScreen = false;
+
+                // Restore all UI elements
+                if (FindName("TabBarRow") is FrameworkElement tabBar) tabBar.Visibility = Visibility.Visible;
+                if (FindName("NavBarRow") is FrameworkElement navBar) navBar.Visibility = Visibility.Visible;
+                if (FindName("BookmarksBar") is FrameworkElement bookmarks)
+                    bookmarks.Visibility = App.Settings.CurrentSettings.ShowBookmarksBar ? Visibility.Visible : Visibility.Collapsed;
+                if (FindName("StatusBarRow") is FrameworkElement statusBar) statusBar.Visibility = Visibility.Visible;
+
+                // Restore window state
+                WindowStyle = _previousWindowStyle;
+                WindowState = _previousWindowState;
+            }
+        });
+    }
+
     private void OnWebResourceRequested(CoreWebView2WebResourceRequestedEventArgs e)
     {
         // Fast path - skip all checks if blockers disabled
@@ -1565,6 +1633,18 @@ public partial class MainWindow : Window
 
     public void NavigateToUrl(string url)
     {
+        NavigateToUrl(url, false);
+    }
+
+    public void NavigateToUrl(string url, bool forceNewTab)
+    {
+        // Always open zarla:// URLs in a new tab to prevent glitches
+        if (url.StartsWith("zarla://") || forceNewTab)
+        {
+            _tabManager.CreateTab(url);
+            return;
+        }
+
         if (_tabManager.ActiveTab != null)
         {
             NavigateTab(_tabManager.ActiveTab, url);
@@ -2089,6 +2169,61 @@ public partial class MainWindow : Window
         NavigateToUrl("zarla://about");
     }
 
+    private async void ReadingMode_Click(object sender, RoutedEventArgs e)
+    {
+        MenuPopup.IsOpen = false;
+        if (_tabManager.ActiveTab != null && _webViews.TryGetValue(_tabManager.ActiveTab.Id, out var webView))
+        {
+            var isDark = App.Settings.CurrentSettings.Theme == "Dark";
+            var script = ReadingMode.GetReadingModeScript(isDark);
+            await webView.CoreWebView2.ExecuteScriptAsync(script);
+        }
+    }
+
+    private async void Screenshot_Click(object sender, RoutedEventArgs e)
+    {
+        MenuPopup.IsOpen = false;
+        if (_tabManager.ActiveTab != null && _webViews.TryGetValue(_tabManager.ActiveTab.Id, out var webView))
+        {
+            try
+            {
+                using var stream = new MemoryStream();
+                await webView.CoreWebView2.CapturePreviewAsync(
+                    Microsoft.Web.WebView2.Core.CoreWebView2CapturePreviewImageFormat.Png,
+                    stream);
+
+                // Save to Downloads folder
+                var downloadsPath = App.Settings.CurrentSettings.DownloadPath;
+                var fileName = $"Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+                var filePath = Path.Combine(downloadsPath, fileName);
+
+                stream.Position = 0;
+                using var fileStream = File.Create(filePath);
+                await stream.CopyToAsync(fileStream);
+
+                // Notify user
+                StatusText.Text = $"Screenshot saved: {fileName}";
+
+                // Open file location
+                System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = $"Screenshot failed: {ex.Message}";
+            }
+        }
+    }
+
+    private async void PictureInPicture_Click(object sender, RoutedEventArgs e)
+    {
+        MenuPopup.IsOpen = false;
+        if (_tabManager.ActiveTab != null && _webViews.TryGetValue(_tabManager.ActiveTab.Id, out var webView))
+        {
+            var script = PictureInPicture.GetPiPScript();
+            await webView.CoreWebView2.ExecuteScriptAsync(script);
+        }
+    }
+
     // Find bar handlers
     private void FindTextBox_KeyDown(object sender, KeyEventArgs e)
     {
@@ -2518,63 +2653,263 @@ public partial class MainWindow : Window
             Background = (Brush)FindResource("SurfaceBrush"),
             CornerRadius = new CornerRadius(12, 12, 12, 4),
             Padding = new Thickness(14, 10, 14, 10),
-            Margin = new Thickness(0, 0, 40, 12),
+            Margin = new Thickness(0, 0, 16, 12),
             HorizontalAlignment = HorizontalAlignment.Left,
-            MaxWidth = 350
+            MaxWidth = 380
         };
 
-        // Convert markdown to HTML and display in WebBrowser
-        var isDark = App.Settings.CurrentSettings.Theme == "Dark";
-        var html = ConvertMarkdownToHtml(message, isDark, isSuccess);
+        // Create a StackPanel to hold formatted text
+        var contentPanel = new StackPanel();
 
-        var webBrowser = new WebBrowser
+        // Add Zarla AI label
+        var labelText = new TextBlock
         {
-            MinHeight = 30,
-            MaxHeight = 400
+            Text = "Zarla AI",
+            FontSize = 11,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = (Brush)FindResource("AccentBrush"),
+            Margin = new Thickness(0, 0, 0, 6)
         };
+        contentPanel.Children.Add(labelText);
 
-        // Load HTML after browser is loaded
-        webBrowser.Loaded += (s, e) =>
-        {
-            try
-            {
-                webBrowser.NavigateToString(html);
-            }
-            catch { }
-        };
+        // Convert markdown to WPF elements
+        var formattedContent = ConvertMarkdownToWpf(message, isSuccess);
+        contentPanel.Children.Add(formattedContent);
 
-        // Auto-resize based on content
-        webBrowser.LoadCompleted += (s, e) =>
-        {
-            try
-            {
-                dynamic doc = webBrowser.Document;
-                if (doc?.body != null)
-                {
-                    var height = Math.Min(400, Math.Max(30, (int)doc.body.scrollHeight + 10));
-                    webBrowser.Height = height;
-                }
-            }
-            catch { webBrowser.Height = 100; }
-
-            // Ensure scroll to bottom after content loads
-            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, new Action(() =>
-            {
-                ScrollToBottom();
-            }));
-        };
-
-        border.Child = webBrowser;
+        border.Child = contentPanel;
         AIChatPanel.Children.Add(border);
 
-        // Immediate scroll attempt
+        // Scroll to bottom
         ScrollToBottom();
-
-        // Delayed scroll to ensure layout is complete
         Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
         {
             ScrollToBottom();
         }));
+    }
+
+    /// <summary>
+    /// Converts markdown text to WPF UIElements for native display
+    /// </summary>
+    private UIElement ConvertMarkdownToWpf(string markdown, bool isSuccess)
+    {
+        var panel = new StackPanel();
+        var isDark = App.Settings.CurrentSettings.Theme == "Dark";
+        var textColor = isSuccess
+            ? (Brush)FindResource("TextBrush")
+            : new SolidColorBrush(Color.FromRgb(255, 107, 107)); // Error red
+        var codeBackground = isDark
+            ? new SolidColorBrush(Color.FromRgb(30, 30, 30))
+            : new SolidColorBrush(Color.FromRgb(232, 232, 232));
+
+        var lines = markdown.Split('\n');
+        bool inCodeBlock = false;
+        var codeBlockContent = new StringBuilder();
+        string codeLanguage = "";
+
+        foreach (var line in lines)
+        {
+            // Handle code blocks
+            if (line.TrimStart().StartsWith("```"))
+            {
+                if (!inCodeBlock)
+                {
+                    inCodeBlock = true;
+                    codeLanguage = line.TrimStart().Substring(3).Trim();
+                    codeBlockContent.Clear();
+                }
+                else
+                {
+                    // End code block - create code display
+                    var codeBorder = new Border
+                    {
+                        Background = codeBackground,
+                        CornerRadius = new CornerRadius(6),
+                        Padding = new Thickness(10),
+                        Margin = new Thickness(0, 4, 0, 4)
+                    };
+
+                    var codeText = new TextBlock
+                    {
+                        Text = codeBlockContent.ToString().TrimEnd(),
+                        FontFamily = new FontFamily("Cascadia Code, Consolas, monospace"),
+                        FontSize = 12,
+                        Foreground = textColor,
+                        TextWrapping = TextWrapping.Wrap
+                    };
+
+                    codeBorder.Child = codeText;
+                    panel.Children.Add(codeBorder);
+                    inCodeBlock = false;
+                }
+                continue;
+            }
+
+            if (inCodeBlock)
+            {
+                codeBlockContent.AppendLine(line);
+                continue;
+            }
+
+            // Handle headers
+            if (line.StartsWith("### "))
+            {
+                panel.Children.Add(CreateTextBlock(line.Substring(4), textColor, 14, FontWeights.SemiBold, new Thickness(0, 8, 0, 4)));
+                continue;
+            }
+            if (line.StartsWith("## "))
+            {
+                panel.Children.Add(CreateTextBlock(line.Substring(3), textColor, 15, FontWeights.SemiBold, new Thickness(0, 8, 0, 4)));
+                continue;
+            }
+            if (line.StartsWith("# "))
+            {
+                panel.Children.Add(CreateTextBlock(line.Substring(2), textColor, 16, FontWeights.Bold, new Thickness(0, 8, 0, 4)));
+                continue;
+            }
+
+            // Handle bullet points
+            if (line.TrimStart().StartsWith("- ") || line.TrimStart().StartsWith("* "))
+            {
+                var bulletPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
+                bulletPanel.Children.Add(new TextBlock { Text = "  •  ", Foreground = (Brush)FindResource("AccentBrush"), FontSize = 13 });
+                bulletPanel.Children.Add(CreateFormattedTextBlock(line.TrimStart().Substring(2), textColor, codeBackground));
+                panel.Children.Add(bulletPanel);
+                continue;
+            }
+
+            // Handle numbered lists
+            var numberedMatch = System.Text.RegularExpressions.Regex.Match(line.TrimStart(), @"^(\d+)\.\s+(.+)$");
+            if (numberedMatch.Success)
+            {
+                var bulletPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
+                bulletPanel.Children.Add(new TextBlock { Text = $"  {numberedMatch.Groups[1].Value}.  ", Foreground = (Brush)FindResource("AccentBrush"), FontSize = 13 });
+                bulletPanel.Children.Add(CreateFormattedTextBlock(numberedMatch.Groups[2].Value, textColor, codeBackground));
+                panel.Children.Add(bulletPanel);
+                continue;
+            }
+
+            // Handle blockquotes
+            if (line.TrimStart().StartsWith("> "))
+            {
+                var quoteBorder = new Border
+                {
+                    BorderBrush = (Brush)FindResource("AccentBrush"),
+                    BorderThickness = new Thickness(3, 0, 0, 0),
+                    Padding = new Thickness(10, 4, 4, 4),
+                    Margin = new Thickness(0, 4, 0, 4)
+                };
+                quoteBorder.Child = CreateFormattedTextBlock(line.TrimStart().Substring(2), textColor, codeBackground);
+                panel.Children.Add(quoteBorder);
+                continue;
+            }
+
+            // Handle empty lines
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                panel.Children.Add(new Border { Height = 8 });
+                continue;
+            }
+
+            // Regular paragraph with inline formatting
+            panel.Children.Add(CreateFormattedTextBlock(line, textColor, codeBackground));
+        }
+
+        return panel;
+    }
+
+    private TextBlock CreateTextBlock(string text, Brush foreground, double fontSize, FontWeight fontWeight, Thickness margin)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            Foreground = foreground,
+            FontSize = fontSize,
+            FontWeight = fontWeight,
+            Margin = margin,
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private TextBlock CreateFormattedTextBlock(string text, Brush textColor, Brush codeBackground)
+    {
+        var textBlock = new TextBlock
+        {
+            FontSize = 13,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = textColor,
+            Margin = new Thickness(0, 2, 0, 2),
+            LineHeight = 20
+        };
+
+        // Parse inline formatting: **bold**, *italic*, `code`, [links](url)
+        var pattern = @"(\*\*[^*]+\*\*)|(\*[^*]+\*)|(`[^`]+`)|(\[[^\]]+\]\([^)]+\))";
+        var parts = System.Text.RegularExpressions.Regex.Split(text, pattern);
+
+        foreach (var part in parts)
+        {
+            if (string.IsNullOrEmpty(part)) continue;
+
+            if (part.StartsWith("**") && part.EndsWith("**"))
+            {
+                // Bold
+                textBlock.Inlines.Add(new System.Windows.Documents.Run(part.Substring(2, part.Length - 4)) { FontWeight = FontWeights.Bold });
+            }
+            else if (part.StartsWith("*") && part.EndsWith("*") && !part.StartsWith("**"))
+            {
+                // Italic
+                textBlock.Inlines.Add(new System.Windows.Documents.Run(part.Substring(1, part.Length - 2)) { FontStyle = FontStyles.Italic });
+            }
+            else if (part.StartsWith("`") && part.EndsWith("`"))
+            {
+                // Inline code
+                var codeBorder = new Border
+                {
+                    Background = codeBackground,
+                    CornerRadius = new CornerRadius(3),
+                    Padding = new Thickness(4, 1, 4, 1),
+                    Margin = new Thickness(2, 0, 2, 0)
+                };
+                codeBorder.Child = new TextBlock
+                {
+                    Text = part.Substring(1, part.Length - 2),
+                    FontFamily = new FontFamily("Cascadia Code, Consolas, monospace"),
+                    FontSize = 12,
+                    Foreground = textColor
+                };
+                textBlock.Inlines.Add(new System.Windows.Documents.InlineUIContainer(codeBorder));
+            }
+            else if (part.StartsWith("[") && part.Contains("]("))
+            {
+                // Link [text](url)
+                var linkMatch = System.Text.RegularExpressions.Regex.Match(part, @"\[([^\]]+)\]\(([^)]+)\)");
+                if (linkMatch.Success)
+                {
+                    var linkText = linkMatch.Groups[1].Value;
+                    var linkUrl = linkMatch.Groups[2].Value;
+                    var hyperlink = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run(linkText))
+                    {
+                        NavigateUri = new Uri(linkUrl, UriKind.RelativeOrAbsolute),
+                        Foreground = (Brush)FindResource("AccentBrush")
+                    };
+                    hyperlink.RequestNavigate += (s, e) =>
+                    {
+                        NavigateToUrl(e.Uri.ToString());
+                        e.Handled = true;
+                    };
+                    textBlock.Inlines.Add(hyperlink);
+                }
+                else
+                {
+                    textBlock.Inlines.Add(new System.Windows.Documents.Run(part));
+                }
+            }
+            else
+            {
+                textBlock.Inlines.Add(new System.Windows.Documents.Run(part));
+            }
+        }
+
+        return textBlock;
     }
 
     private void ClearAIChat_Click(object sender, RoutedEventArgs e)
@@ -2594,80 +2929,6 @@ public partial class MainWindow : Window
 
         // Clear AI memory
         _aiService?.ClearHistory();
-    }
-    
-    private string ConvertMarkdownToHtml(string markdown, bool isDark, bool isSuccess)
-    {
-        // Use basic markdown pipeline
-        var htmlBody = Markdig.Markdown.ToHtml(markdown);
-        
-        var bgColor = isDark ? "#2d2d2d" : "#f5f5f5";
-        var textColor = isDark ? "#e0e0e0" : "#333333";
-        var codeBackground = isDark ? "#1e1e1e" : "#e8e8e8";
-        var linkColor = isDark ? "#6ea8fe" : "#0066cc";
-        var errorColor = "#ff6b6b";
-        
-        if (!isSuccess) textColor = errorColor;
-        
-        return $@"<!DOCTYPE html>
-<html>
-<head>
-<meta charset='UTF-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge'>
-<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<style>
-    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-    body {{ 
-        font-family: 'Segoe UI', sans-serif; 
-        font-size: 13px; 
-        line-height: 1.5;
-        color: {textColor}; 
-        background: {bgColor};
-        padding: 4px;
-        overflow-x: hidden;
-    }}
-    p {{ margin: 0 0 8px 0; }}
-    p:last-child {{ margin-bottom: 0; }}
-    code {{ 
-        background: {codeBackground}; 
-        padding: 2px 6px; 
-        border-radius: 4px; 
-        font-family: 'Cascadia Code', 'Consolas', monospace;
-        font-size: 12px;
-    }}
-    pre {{ 
-        background: {codeBackground}; 
-        padding: 10px; 
-        border-radius: 6px; 
-        overflow-x: auto;
-        margin: 8px 0;
-    }}
-    pre code {{ 
-        background: transparent; 
-        padding: 0; 
-    }}
-    a {{ color: {linkColor}; text-decoration: none; }}
-    a:hover {{ text-decoration: underline; }}
-    ul, ol {{ margin: 8px 0; padding-left: 20px; }}
-    li {{ margin: 4px 0; }}
-    strong {{ font-weight: 600; }}
-    h1, h2, h3, h4 {{ margin: 8px 0 4px 0; font-weight: 600; }}
-    h1 {{ font-size: 16px; }}
-    h2 {{ font-size: 15px; }}
-    h3 {{ font-size: 14px; }}
-    blockquote {{ 
-        border-left: 3px solid {linkColor}; 
-        padding-left: 10px; 
-        margin: 8px 0;
-        opacity: 0.9;
-    }}
-    table {{ border-collapse: collapse; margin: 8px 0; width: 100%; }}
-    th, td {{ border: 1px solid {(isDark ? "#444" : "#ddd")}; padding: 6px 8px; text-align: left; }}
-    th {{ background: {codeBackground}; }}
-</style>
-</head>
-<body>{htmlBody}</body>
-</html>";
     }
 
     private void ScrollToBottom()

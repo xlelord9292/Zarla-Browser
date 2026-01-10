@@ -36,7 +36,7 @@
         </Grid.RowDefinitions>
 
         <!-- Tab Bar -->
-        <Grid Grid.Row="0" Background="{DynamicResource BackgroundBrush}" Height="40">
+        <Grid x:Name="TabBarRow" Grid.Row="0" Background="{DynamicResource BackgroundBrush}" Height="40">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -65,7 +65,7 @@
         </Grid>
 
         <!-- Navigation Bar -->
-        <Grid Grid.Row="1" Background="{DynamicResource SurfaceBrush}" Height="48">
+        <Grid x:Name="NavBarRow" Grid.Row="1" Background="{DynamicResource SurfaceBrush}" Height="48">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -385,7 +385,7 @@
         </Grid>
 
         <!-- Status Bar -->
-        <Border Grid.Row="4"
+        <Border x:Name="StatusBarRow" Grid.Row="4"
                 Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0"
@@ -506,6 +506,25 @@
                             <TextBlock Text="🔧" Width="24"/>
                             <TextBlock Text="Developer Tools"/>
                             <TextBlock Text="F12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="32,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="8,4"/>
+                    <Button Style="{StaticResource MenuButton}" Click="ReadingMode_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📖" Width="24"/>
+                            <TextBlock Text="Reading Mode"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource MenuButton}" Click="Screenshot_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📷" Width="24"/>
+                            <TextBlock Text="Screenshot"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource MenuButton}" Click="PictureInPicture_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📺" Width="24"/>
+                            <TextBlock Text="Picture in Picture"/>
                         </StackPanel>
                     </Button>
                     <Separator Background="{DynamicResource BorderBrush}" Margin="8,4"/>

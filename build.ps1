@@ -1,17 +1,144 @@
 # Zarla Browser Build Script
-# Usage: .\build.ps1 [-Release] [-Installer]
+# Usage: .\build.ps1 [-Version "1.0.2"] [-Clean] [-DebugOnly]
+# By default, this script builds in Release mode and creates the installer.
 
 param(
-    [switch]$Release,
-    [switch]$Installer,
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$DebugOnly,  # Use this flag to only do a debug build (no installer)
+    [string]$Version,
+    [string]$EncryptKey
 )
 
+# Configuration - Edit these to customize
+$BrowserName = "Zarla"
+$InstallerName = "ZarlaSetup"
+
 $ErrorActionPreference = "Stop"
+
+# Function to encrypt API key for embedding in config
+function Get-EncryptedApiKey {
+    param([string]$ApiKey)
+    
+    # Use the same encryption as SecureStorage.EncryptPortable()
+    $keyString = "ZarlaBrowser-Embedded-Key-v1-Zarla.Core"
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    $aesKey = $sha256.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($keyString))
+    
+    $md5 = [System.Security.Cryptography.MD5]::Create()
+    $aesIv = $md5.ComputeHash([System.Text.Encoding]::UTF8.GetBytes("Zarla-IV-2024"))
+    
+    $aes = [System.Security.Cryptography.Aes]::Create()
+    $aes.Key = $aesKey
+    $aes.IV = $aesIv
+    $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
+    $aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+    
+    $encryptor = $aes.CreateEncryptor()
+    $plainBytes = [System.Text.Encoding]::UTF8.GetBytes($ApiKey)
+    $encryptedBytes = $encryptor.TransformFinalBlock($plainBytes, 0, $plainBytes.Length)
+    
+    return [Convert]::ToBase64String($encryptedBytes)
+}
+
+# If EncryptKey parameter is provided, just encrypt and exit
+if ($EncryptKey) {
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "  API Key Encryption Tool" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    $encrypted = Get-EncryptedApiKey -ApiKey $EncryptKey
+    
+    Write-Host "Your encrypted API key:" -ForegroundColor Green
+    Write-Host ""
+    Write-Host $encrypted -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Add this to zarla-config.json:" -ForegroundColor White
+    Write-Host '  "encryptedAIApiKey": "' -NoNewline -ForegroundColor Gray
+    Write-Host $encrypted -NoNewline -ForegroundColor Yellow
+    Write-Host '"' -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "Users will NOT need to set any environment variables!" -ForegroundColor Green
+    Write-Host ""
+    exit 0
+}
+
+# Function to encrypt API key in config if present
+function Encrypt-ApiKeyInConfig {
+    if (Test-Path $configPath) {
+        $configContent = Get-Content $configPath -Raw | ConvertFrom-Json
+        
+        # Check if there's a plain API key that needs encrypting
+        if ($configContent.aiApiKey -and $configContent.aiApiKey -ne "") {
+            Write-Host "Found API key in config - encrypting..." -ForegroundColor Yellow
+            
+            $encrypted = Get-EncryptedApiKey -ApiKey $configContent.aiApiKey
+            
+            # Update the JSON - set encrypted key and clear plain key
+            $jsonContent = Get-Content $configPath -Raw
+            $jsonContent = $jsonContent -replace '"aiApiKey"\s*:\s*"[^"]*"', '"aiApiKey": ""'
+            $jsonContent = $jsonContent -replace '"encryptedAIApiKey"\s*:\s*(?:null|"[^"]*")', "`"encryptedAIApiKey`": `"$encrypted`""
+            Set-Content $configPath $jsonContent -NoNewline
+            
+            Write-Host "API key encrypted and embedded in config!" -ForegroundColor Green
+            Write-Host "Users will NOT need to set any environment variables." -ForegroundColor Green
+            Write-Host ""
+        }
+    }
+}
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Zarla Browser Build Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# Read version from zarla-config.json if not provided
+$configPath = "zarla-config.json"
+if (-not $Version) {
+    if (Test-Path $configPath) {
+        $config = Get-Content $configPath | ConvertFrom-Json
+        $Version = $config.version
+        Write-Host "Using version from config: $Version" -ForegroundColor Cyan
+    } else {
+        $Version = "1.0.0"
+        Write-Host "Using default version: $Version" -ForegroundColor Yellow
+    }
+}
+
+# Update version in zarla-config.json
+function Update-ConfigVersion {
+    param([string]$NewVersion)
+    
+    if (Test-Path $configPath) {
+        $jsonContent = Get-Content $configPath -Raw
+        # Use regex to update just the version field while preserving formatting
+        $updatedJson = $jsonContent -replace '"version"\s*:\s*"[^"]*"', "`"version`": `"$NewVersion`""
+        Set-Content $configPath $updatedJson -NoNewline
+        Write-Host "Updated zarla-config.json version to $NewVersion" -ForegroundColor Green
+    }
+}
+
+# Update version in NSIS installer script
+function Update-InstallerVersion {
+    param([string]$NewVersion)
+    
+    $nsisScript = "installer\zarla-installer.nsi"
+    if (Test-Path $nsisScript) {
+        $content = Get-Content $nsisScript -Raw
+        $content = $content -replace '!define PRODUCT_VERSION "[^"]*"', "!define PRODUCT_VERSION `"$NewVersion`""
+        Set-Content $nsisScript $content
+        Write-Host "Updated NSIS installer version to $NewVersion" -ForegroundColor Green
+    }
+}
+
+# Update versions in both config and installer
+Update-ConfigVersion -NewVersion $Version
+Update-InstallerVersion -NewVersion $Version
+
+# Encrypt API key if present in config
+Encrypt-ApiKeyInConfig
+
 Write-Host ""
 
 # Clean if requested
@@ -34,15 +161,15 @@ Write-Host "Restore complete!" -ForegroundColor Green
 Write-Host ""
 
 # Build
-$config = if ($Release) { "Release" } else { "Debug" }
+$config = if ($DebugOnly) { "Debug" } else { "Release" }
 Write-Host "Building Zarla ($config)..." -ForegroundColor Yellow
 dotnet build -c $config
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 Write-Host "Build complete!" -ForegroundColor Green
 Write-Host ""
 
-# Publish for installer
-if ($Release -or $Installer) {
+# Publish for installer (always do this unless DebugOnly)
+if (-not $DebugOnly) {
     Write-Host "Publishing self-contained executable..." -ForegroundColor Yellow
 
     # Windows x64
@@ -62,10 +189,8 @@ if ($Release -or $Installer) {
     # Output location
     Write-Host "Published to: publish\win-x64\" -ForegroundColor Cyan
     Write-Host ""
-}
 
-# Build installer
-if ($Installer) {
+    # Build installer (always build installer in default mode)
     Write-Host "Building NSIS installer..." -ForegroundColor Yellow
 
     # Check if NSIS is installed
@@ -88,7 +213,7 @@ if ($Installer) {
             Write-Host "" -ForegroundColor Green
             Write-Host "========================================" -ForegroundColor Green
             Write-Host "  Installer created successfully!" -ForegroundColor Green
-            Write-Host "  Location: installer\ZarlaSetup-1.0.0.exe" -ForegroundColor White
+            Write-Host "  Location: installer\$InstallerName-$Version.exe" -ForegroundColor White
             Write-Host "========================================" -ForegroundColor Green
         } else {
             Write-Host "Installer build failed!" -ForegroundColor Red
@@ -111,9 +236,9 @@ Write-Host "  Build Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "To run Zarla:" -ForegroundColor White
-if ($Release) {
-    Write-Host "  .\publish\win-x64\Zarla.exe" -ForegroundColor Gray
-} else {
+if ($DebugOnly) {
     Write-Host "  dotnet run --project src\Zarla.Browser" -ForegroundColor Gray
+} else {
+    Write-Host "  .\publish\win-x64\Zarla.exe" -ForegroundColor Gray
 }
 Write-Host ""

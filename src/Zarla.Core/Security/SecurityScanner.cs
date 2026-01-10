@@ -120,19 +120,140 @@ public class SecurityScanner : IDisposable
 
     private void LoadTrustedDomains()
     {
-        // Always trusted domains (skip scanning)
+        // Always trusted domains (skip scanning) - comprehensive list
         var trusted = new[]
         {
-            "google.com", "youtube.com", "facebook.com", "amazon.com",
-            "microsoft.com", "apple.com", "github.com", "twitter.com",
-            "x.com", "reddit.com", "wikipedia.org", "linkedin.com",
-            "netflix.com", "spotify.com", "twitch.tv", "discord.com",
-            "instagram.com", "whatsapp.com", "telegram.org", "tiktok.com",
-            "paypal.com", "ebay.com", "walmart.com", "target.com",
-            "chase.com", "bankofamerica.com", "wellsfargo.com", "capitalone.com",
-            "stackoverflow.com", "cloudflare.com", "mozilla.org"
+            // Major tech companies
+            "google.com", "youtube.com", "gmail.com", "googleapis.com", "gstatic.com",
+            "googlevideo.com", "googleusercontent.com", "google.co.uk", "google.ca",
+            "microsoft.com", "live.com", "outlook.com", "office.com", "azure.com",
+            "windows.com", "xbox.com", "bing.com", "msn.com", "skype.com",
+            "apple.com", "icloud.com", "itunes.com",
+            "amazon.com", "amazonaws.com", "aws.amazon.com", "amazon.co.uk",
+            "meta.com", "facebook.com", "fb.com", "instagram.com", "whatsapp.com",
+            "twitter.com", "x.com", "twimg.com",
+
+            // Social media & entertainment
+            "reddit.com", "redd.it", "redditstatic.com",
+            "linkedin.com", "licdn.com",
+            "pinterest.com", "pinimg.com",
+            "tumblr.com",
+            "snapchat.com", "snap.com",
+            "tiktok.com", "tiktokcdn.com",
+            "discord.com", "discordapp.com", "discord.gg",
+            "twitch.tv", "twitchcdn.net",
+            "youtube.com", "youtu.be", "ytimg.com",
+            "netflix.com", "nflxvideo.net",
+            "spotify.com", "scdn.co",
+            "hulu.com", "disneyplus.com",
+            "hbomax.com", "max.com",
+            "primevideo.com",
+            "crunchyroll.com", "funimation.com",
+            "soundcloud.com", "bandcamp.com",
+            "vimeo.com", "dailymotion.com",
+
+            // News & media
+            "cnn.com", "bbc.com", "bbc.co.uk", "nytimes.com", "washingtonpost.com",
+            "theguardian.com", "reuters.com", "apnews.com", "npr.org",
+            "foxnews.com", "nbcnews.com", "cbsnews.com", "abcnews.go.com",
+            "usatoday.com", "wsj.com", "bloomberg.com", "forbes.com",
+            "huffpost.com", "buzzfeed.com", "vice.com", "vox.com",
+            "techcrunch.com", "theverge.com", "wired.com", "arstechnica.com",
+            "engadget.com", "gizmodo.com", "mashable.com", "cnet.com",
+            "ign.com", "gamespot.com", "kotaku.com", "polygon.com",
+
+            // Shopping & commerce
+            "ebay.com", "etsy.com", "shopify.com",
+            "walmart.com", "target.com", "bestbuy.com", "costco.com",
+            "homedepot.com", "lowes.com", "ikea.com",
+            "newegg.com", "bhphotovideo.com",
+            "aliexpress.com", "alibaba.com",
+            "wish.com", "shein.com", "temu.com",
+            "wayfair.com", "overstock.com",
+            "zappos.com", "nordstrom.com", "macys.com",
+            "nike.com", "adidas.com", "underarmour.com",
+
+            // Banking & finance
+            "paypal.com", "venmo.com", "cashapp.com",
+            "chase.com", "bankofamerica.com", "wellsfargo.com",
+            "capitalone.com", "citibank.com", "usbank.com",
+            "americanexpress.com", "discover.com",
+            "fidelity.com", "vanguard.com", "schwab.com",
+            "robinhood.com", "coinbase.com", "binance.com",
+            "stripe.com", "square.com", "plaid.com",
+
+            // Developer & tech
+            "github.com", "gitlab.com", "bitbucket.org",
+            "stackoverflow.com", "stackexchange.com",
+            "npmjs.com", "pypi.org", "rubygems.org", "nuget.org",
+            "docker.com", "hub.docker.com",
+            "heroku.com", "vercel.com", "netlify.com", "railway.app",
+            "digitalocean.com", "linode.com", "vultr.com",
+            "cloudflare.com", "fastly.com", "akamai.com",
+            "godaddy.com", "namecheap.com", "domains.google",
+            "mozilla.org", "firefox.com",
+            "opera.com", "brave.com", "vivaldi.com",
+            "jetbrains.com", "visualstudio.com", "code.visualstudio.com",
+            "atlassian.com", "jira.com", "trello.com", "confluence.com",
+            "slack.com", "zoom.us", "teams.microsoft.com",
+            "notion.so", "airtable.com", "asana.com", "monday.com",
+            "figma.com", "canva.com", "adobe.com", "behance.net", "dribbble.com",
+
+            // Education & reference
+            "wikipedia.org", "wikimedia.org", "wiktionary.org",
+            "archive.org", "web.archive.org",
+            "quora.com", "medium.com", "substack.com",
+            "coursera.org", "udemy.com", "edx.org", "khanacademy.org",
+            "duolingo.com", "skillshare.com", "masterclass.com",
+            "mit.edu", "stanford.edu", "harvard.edu", "berkeley.edu",
+            "docs.google.com", "drive.google.com", "sheets.google.com",
+
+            // Gaming
+            "steampowered.com", "store.steampowered.com", "steamcommunity.com",
+            "epicgames.com", "gog.com", "origin.com", "ea.com",
+            "blizzard.com", "battle.net", "activision.com",
+            "riotgames.com", "leagueoflegends.com", "valorant.com",
+            "ubisoft.com", "rockstargames.com", "bethesda.net",
+            "playstation.com", "nintendo.com", "xbox.com",
+            "roblox.com", "minecraft.net", "fortnite.com",
+            "curseforge.com", "modrinth.com", "nexusmods.com",
+
+            // Utilities & services
+            "dropbox.com", "box.com", "onedrive.com",
+            "evernote.com", "onenote.com",
+            "grammarly.com", "deepl.com", "translate.google.com",
+            "openai.com", "chat.openai.com", "anthropic.com", "claude.ai",
+            "wolframalpha.com", "mathway.com",
+            "speedtest.net", "fast.com",
+            "weather.com", "accuweather.com",
+            "maps.google.com", "waze.com",
+            "uber.com", "lyft.com", "doordash.com", "grubhub.com", "ubereats.com",
+            "airbnb.com", "booking.com", "expedia.com", "tripadvisor.com",
+            "yelp.com", "opentable.com",
+
+            // CDNs and infrastructure (commonly used by all sites)
+            "cloudfront.net", "akamaized.net", "fastly.net",
+            "jsdelivr.net", "unpkg.com", "cdnjs.cloudflare.com",
+            "bootstrapcdn.com", "fontawesome.com",
+            "fonts.googleapis.com", "fonts.gstatic.com",
+            "gravatar.com", "wp.com", "wordpress.com", "wordpress.org",
+            "typekit.net", "use.typekit.net",
+            "recaptcha.net", "gstatic.com",
+            "hcaptcha.com", "cloudflare.com",
+
+            // File sharing
+            "mediafire.com", "mega.nz", "mega.io",
+            "wetransfer.com", "sendspace.com",
+            "imgur.com", "gyazo.com", "prnt.sc", "lightshot.com",
+            "pastebin.com", "hastebin.com", "ghostbin.com",
+
+            // Forums & communities
+            "fandom.com", "wikia.com",
+            "4chan.org", "4channel.org",
+            "resetera.com", "neogaf.com",
+            "somethingawful.com", "kiwifarms.net"
         };
-        
+
         foreach (var domain in trusted)
             _trustedDomains.Add(domain);
     }
@@ -274,72 +395,98 @@ public class SecurityScanner : IDisposable
 
     private void CheckUrlPatterns(string url, string host, SecurityScanResult result)
     {
-        // Check for typosquatting/mirror sites
+        // Skip checks for safe URL schemes
+        if (url.StartsWith("data:") || url.StartsWith("blob:") || url.StartsWith("javascript:") ||
+            url.StartsWith("about:") || url.StartsWith("file:") || url.StartsWith("chrome:") ||
+            url.StartsWith("edge:") || url.StartsWith("zarla://"))
+        {
+            return;
+        }
+
+        // Skip if it's a well-known TLD with a legitimate-looking domain
+        var wellKnownTlds = new[] { ".com", ".org", ".net", ".edu", ".gov", ".io", ".co", ".app", ".dev", ".me", ".tv", ".gg" };
+        var hasWellKnownTld = wellKnownTlds.Any(tld => host.EndsWith(tld));
+
+        // Check for typosquatting/mirror sites - only for very obvious cases
         foreach (var (brand, legitimate) in _legitimateDomains)
         {
-            if (host.Contains(brand) && !host.EndsWith(legitimate) && !host.EndsWith("." + legitimate))
+            // Only check if the host STARTS with the brand name (more precise)
+            // e.g., "google-login.com" but not "mygoogleapp.com"
+            if (host.StartsWith(brand) && !host.EndsWith(legitimate) && !host.EndsWith("." + legitimate))
             {
-                // Possible mirror/typosquatting
+                // Must be very similar to be flagged (higher threshold)
                 var similarity = CalculateSimilarity(host, legitimate);
-                if (similarity > 0.5 && similarity < 1.0)
+                if (similarity > 0.75 && similarity < 1.0)
                 {
-                    result.IsSafe = false;
-                    result.WarningCode = "ZARLA-SEC-002";
-                    result.WarningTitle = "Possible Mirror Website Detected";
-                    result.WarningMessage = $"This website may be impersonating {legitimate}. The URL looks similar but is not the official site.";
-                    result.ThreatType = SecurityThreatType.MirrorSite;
-                    result.RiskScore = 85;
-                    result.Issues.Add($"Possible typosquatting of {legitimate}");
-                    return;
+                    // Additional check: the host should look like it's trying to impersonate
+                    var suspiciousImpersonation = host.Contains("-login") || host.Contains("-secure") ||
+                                                   host.Contains("-verify") || host.Contains("-account") ||
+                                                   host.Contains(".login.") || host.Contains(".secure.");
+
+                    if (suspiciousImpersonation)
+                    {
+                        result.IsSafe = false;
+                        result.WarningCode = "ZARLA-SEC-002";
+                        result.WarningTitle = "Possible Mirror Website Detected";
+                        result.WarningMessage = $"This website may be impersonating {legitimate}. The URL looks similar but is not the official site.";
+                        result.ThreatType = SecurityThreatType.MirrorSite;
+                        result.RiskScore = 85;
+                        result.Issues.Add($"Possible typosquatting of {legitimate}");
+                        return;
+                    }
                 }
             }
         }
 
-        // Check for suspicious URL patterns
-        var suspiciousPatterns = new[]
+        // Only check for very obvious phishing patterns - NOT general patterns
+        // These must be VERY specific to avoid false positives
+        var obviousPhishingPatterns = new[]
         {
-            @"login.*secure.*verify",
-            @"account.*confirm.*update",
-            @"password.*reset.*urgent",
-            @"bank.*verify.*account",
-            @"paypal.*confirm.*identity",
-            @"\d{5,}",  // Long number sequences
-            @"[a-z]{20,}",  // Very long subdomains
-            @"(verify|secure|login|account|update|confirm|password){2,}"  // Multiple suspicious keywords
+            @"^[a-z]+-login-secure-verify\.",  // google-login-secure-verify.com
+            @"^secure-[a-z]+-verify\.",        // secure-paypal-verify.com
+            @"\.ru/.*login.*password",         // Russian domains with login/password paths
+            @"\.tk/.*account.*verify",         // Free TLD with account verification
+            @"^[a-z]{3,}-[a-z]{3,}-[a-z]{3,}-[a-z]{3,}\."  // Multiple hyphenated words: verify-your-account-now.com
         };
 
-        foreach (var pattern in suspiciousPatterns)
+        foreach (var pattern in obviousPhishingPatterns)
         {
-            if (Regex.IsMatch(url, pattern, RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(host + url.Substring(url.IndexOf(host) + host.Length), pattern, RegexOptions.IgnoreCase))
             {
-                result.Issues.Add($"Suspicious URL pattern detected");
-                result.RiskScore = Math.Max(result.RiskScore, 40);
+                result.Issues.Add("Highly suspicious URL pattern");
+                result.RiskScore = Math.Max(result.RiskScore, 70);
             }
         }
 
-        // Check for IP address URLs (often used in phishing)
+        // Check for IP address URLs (often used in phishing) - but only flag, don't block
         if (Regex.IsMatch(host, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"))
         {
-            result.Issues.Add("IP address used instead of domain name");
-            result.RiskScore = Math.Max(result.RiskScore, 50);
+            // Local IPs are fine
+            if (!host.StartsWith("192.168.") && !host.StartsWith("10.") &&
+                !host.StartsWith("127.") && !host.StartsWith("172."))
+            {
+                result.Issues.Add("IP address used instead of domain name");
+                result.RiskScore = Math.Max(result.RiskScore, 30); // Lower score - just a warning
+            }
         }
 
-        // Check for excessive subdomains
-        if (host.Split('.').Length > 4)
+        // Only flag excessive subdomains if combined with other issues
+        if (host.Split('.').Length > 5) // Raised from 4 to 5
         {
-            result.Issues.Add("Excessive subdomains");
-            result.RiskScore = Math.Max(result.RiskScore, 30);
+            result.Issues.Add("Many subdomains detected");
+            result.RiskScore = Math.Max(result.RiskScore, 15); // Very low score
         }
 
-        // Check HTTP (not HTTPS)
-        if (url.StartsWith("http://") && !host.StartsWith("localhost"))
+        // HTTP is common, don't penalize too much
+        if (url.StartsWith("http://") && !host.StartsWith("localhost") && !host.StartsWith("127."))
         {
-            result.Issues.Add("Insecure connection (HTTP)");
-            result.RiskScore = Math.Max(result.RiskScore, 20);
+            result.Issues.Add("Unencrypted connection (HTTP)");
+            result.RiskScore = Math.Max(result.RiskScore, 10); // Very low score
         }
 
-        // If risk score is high enough, flag as unsafe
-        if (result.RiskScore >= 60)
+        // Much higher threshold - only flag if VERY suspicious (score >= 85)
+        // This means multiple strong indicators must be present
+        if (result.RiskScore >= 85)
         {
             result.IsSafe = false;
             result.WarningCode = "ZARLA-SEC-003";
@@ -351,40 +498,46 @@ public class SecurityScanner : IDisposable
 
     private void CheckContentPatterns(string content, string title, SecurityScanResult result)
     {
-        var suspiciousContent = new[]
+        // Only check for VERY specific scam/phishing phrases that normal sites wouldn't use
+        // These must be exact phrases that are clear indicators of scams
+        var obviousScamPhrases = new[]
         {
-            "verify your account immediately",
-            "your account has been suspended",
-            "confirm your identity",
-            "enter your password",
-            "update your payment",
-            "unusual activity detected",
-            "verify your credit card",
-            "click here to claim",
-            "you have won",
-            "act now before",
-            "limited time offer",
-            "your computer is infected"
+            "your account will be closed in 24 hours",
+            "verify your account immediately or it will be suspended",
+            "you have won $1,000,000",
+            "click here to claim your prize",
+            "your computer has been infected with",
+            "call this number immediately",
+            "microsoft has detected a virus",
+            "your ip address has been flagged",
+            "enter your social security number",
+            "send bitcoin to"
         };
 
         var contentLower = content.ToLowerInvariant();
-        foreach (var pattern in suspiciousContent)
+        var matchCount = 0;
+
+        foreach (var phrase in obviousScamPhrases)
         {
-            if (contentLower.Contains(pattern))
+            if (contentLower.Contains(phrase))
             {
-                result.Issues.Add($"Suspicious content: '{pattern}'");
-                result.RiskScore = Math.Max(result.RiskScore, 30);
+                result.Issues.Add($"Suspicious phrase detected");
+                matchCount++;
             }
         }
 
-        // Check for login forms on suspicious pages
-        if (Regex.IsMatch(content, @"<input[^>]*type=[""']password[""']", RegexOptions.IgnoreCase))
+        // Only flag if multiple scam phrases are found (not just one)
+        if (matchCount >= 2)
         {
-            if (result.Issues.Count > 0)
-            {
-                result.Issues.Add("Password form on suspicious page");
-                result.RiskScore = Math.Max(result.RiskScore, 60);
-            }
+            result.RiskScore = Math.Max(result.RiskScore, 50);
+        }
+
+        // Password forms are normal - only flag if the page has OTHER suspicious elements
+        // AND the domain is untrusted AND multiple scam phrases were found
+        if (matchCount >= 2 && Regex.IsMatch(content, @"<input[^>]*type=[""']password[""']", RegexOptions.IgnoreCase))
+        {
+            result.Issues.Add("Password form with suspicious content");
+            result.RiskScore = Math.Max(result.RiskScore, 70);
         }
     }
 

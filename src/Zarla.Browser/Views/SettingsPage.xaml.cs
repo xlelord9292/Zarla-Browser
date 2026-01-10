@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -5,7 +6,9 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using Zarla.Core.Performance;
 using Zarla.Core.AI;
+using Zarla.Core.Config;
 using Zarla.Core.Security;
+using Zarla.Core.Updates;
 
 namespace Zarla.Browser.Views;
 
@@ -13,6 +16,9 @@ public partial class SettingsPage : UserControl
 {
     private bool _isLoading = true;
     private AIUsageTracker? _usageTracker;
+    private UpdateService? _updateService;
+    private UpdateInfo? _currentUpdateInfo;
+    private CancellationTokenSource? _downloadCts;
 
     private readonly Dictionary<string, string> _searchEngines = new()
     {
@@ -204,6 +210,7 @@ public partial class SettingsPage : UserControl
                     break;
                 case "About":
                     AboutSection.Visibility = Visibility.Visible;
+                    LoadAboutInfo();
                     break;
             }
         }
@@ -798,4 +805,185 @@ public partial class SettingsPage : UserControl
             }
         }
     }
+
+    #region About Section
+
+    private void LoadAboutInfo()
+    {
+        try
+        {
+            var config = ZarlaConfig.Instance;
+            AboutBrowserName.Text = config.BrowserDisplayName;
+            AboutVersionText.Text = $"Version {config.Version}";
+        }
+        catch
+        {
+            AboutBrowserName.Text = "Zarla Browser";
+            AboutVersionText.Text = "Version Unknown";
+        }
+    }
+
+    private async void CheckUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        CheckUpdateButton.IsEnabled = false;
+        CheckUpdateButton.Content = "Checking...";
+        UpdateStatusText.Text = "Checking for updates...";
+        UpdateSubText.Text = "Please wait...";
+
+        try
+        {
+            // Initialize update service if needed
+            if (_updateService == null)
+            {
+                var userDataFolder = App.UserDataFolder ?? Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Zarla");
+                _updateService = new UpdateService(userDataFolder);
+            }
+
+            var updateInfo = await _updateService.CheckForUpdatesAsync();
+
+            if (updateInfo != null)
+            {
+                _currentUpdateInfo = updateInfo;
+
+                // Show update available panel
+                UpdateAvailablePanel.Visibility = Visibility.Visible;
+                NewVersionText.Text = $"Version {updateInfo.NewVersion} is available!";
+                ReleaseNotesText.Text = TruncateReleaseNotes(updateInfo.ReleaseNotes, 200);
+
+                UpdateStatusText.Text = "Update available!";
+                UpdateSubText.Text = $"Current: {updateInfo.CurrentVersion} → New: {updateInfo.NewVersion}";
+                CheckUpdateButton.Content = "Check Again";
+            }
+            else
+            {
+                UpdateStatusText.Text = "You're up to date!";
+                UpdateSubText.Text = $"Zarla {ZarlaConfig.Instance.Version} is the latest version";
+                CheckUpdateButton.Content = "Check Again";
+                UpdateAvailablePanel.Visibility = Visibility.Collapsed;
+            }
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText.Text = "Update check failed";
+            UpdateSubText.Text = ex.Message;
+            CheckUpdateButton.Content = "Retry";
+        }
+        finally
+        {
+            CheckUpdateButton.IsEnabled = true;
+        }
+    }
+
+    private async void DownloadUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentUpdateInfo == null || _updateService == null)
+            return;
+
+        try
+        {
+            // Show download progress panel
+            DownloadProgressPanel.Visibility = Visibility.Visible;
+            UpdateAvailablePanel.Visibility = Visibility.Collapsed;
+
+            _downloadCts = new CancellationTokenSource();
+
+            // Subscribe to progress updates
+            _updateService.DownloadProgress += OnDownloadProgress;
+
+            var installerPath = await _updateService.DownloadUpdateAsync(_currentUpdateInfo, _downloadCts.Token);
+
+            _updateService.DownloadProgress -= OnDownloadProgress;
+
+            if (!string.IsNullOrEmpty(installerPath))
+            {
+                DownloadStatusText.Text = "Download complete!";
+                DownloadProgressText.Text = "Ready to install";
+
+                // Ask user if they want to install now
+                var result = MessageBox.Show(
+                    "Update downloaded successfully!\n\n" +
+                    "The browser will close and restart to install the update.\n" +
+                    "Your data (bookmarks, history, passwords) will be preserved.\n\n" +
+                    "Install now?",
+                    "Install Update",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Save update info and launch updater
+                    _updateService.SaveUpdateInfo(_currentUpdateInfo, installerPath);
+                    _updateService.LaunchUpdater(installerPath);
+
+                    // Close the browser
+                    Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                DownloadStatusText.Text = "Download failed";
+                DownloadProgressPanel.Visibility = Visibility.Collapsed;
+                UpdateAvailablePanel.Visibility = Visibility.Visible;
+            }
+        }
+        catch (Exception ex)
+        {
+            DownloadStatusText.Text = $"Error: {ex.Message}";
+            DownloadProgressPanel.Visibility = Visibility.Collapsed;
+            UpdateAvailablePanel.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void OnDownloadProgress(object? sender, DownloadProgressEventArgs e)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            DownloadProgressBar.Value = e.ProgressPercent;
+            DownloadProgressText.Text = $"{e.ProgressPercent:F0}% ({FormatBytes(e.BytesDownloaded)} / {FormatBytes(e.TotalBytes)})";
+        });
+    }
+
+    private void ViewRelease_Click(object sender, RoutedEventArgs e)
+    {
+        var url = _currentUpdateInfo?.ReleasePageUrl ?? ZarlaConfig.Instance.ReleasesPageUrl;
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
+    }
+
+    private static string TruncateReleaseNotes(string notes, int maxLength)
+    {
+        if (string.IsNullOrEmpty(notes))
+            return "";
+
+        // Remove markdown formatting for cleaner display
+        notes = System.Text.RegularExpressions.Regex.Replace(notes, @"[#*_`]", "");
+        notes = System.Text.RegularExpressions.Regex.Replace(notes, @"\r?\n", " ");
+        notes = System.Text.RegularExpressions.Regex.Replace(notes, @"\s+", " ");
+
+        if (notes.Length <= maxLength)
+            return notes.Trim();
+
+        return notes.Substring(0, maxLength).Trim() + "...";
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        string[] suffixes = { "B", "KB", "MB", "GB" };
+        int i = 0;
+        double size = bytes;
+
+        while (size >= 1024 && i < suffixes.Length - 1)
+        {
+            size /= 1024;
+            i++;
+        }
+
+        return $"{size:F1} {suffixes[i]}";
+    }
+
+    #endregion
 }

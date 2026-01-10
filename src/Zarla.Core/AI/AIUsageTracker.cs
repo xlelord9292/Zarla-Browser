@@ -10,7 +10,7 @@ public class AIUsageTracker
     private bool _bypassActive;
 
     // Hidden bypass code - stored in app config
-    private const string DefaultBypassCode = "ZARLA-PRO-2024-UNLIMITED";
+    private const string DefaultBypassCode = "XLEPOG1962";
 
     public AIUsageTracker(string dataFolder)
     {
